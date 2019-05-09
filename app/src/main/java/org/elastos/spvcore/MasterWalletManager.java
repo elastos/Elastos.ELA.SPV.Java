@@ -9,6 +9,11 @@ public class MasterWalletManager {
 	private long mManagerProxy = 0;
 	private String mRootPath = null;
 
+	static {
+		System.loadLibrary("spvsdk");
+		System.loadLibrary("elastoswallet");
+	}
+
 	/**
 	 * Constructor
 	 * @param rootPath specify directory for all config files, including mnemonic config files and peer connection config files. Root should not be empty, otherwise will throw invalid argument exception.
