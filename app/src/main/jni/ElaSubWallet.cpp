@@ -153,7 +153,7 @@ class ElaSubWalletCallback: public ISubWalletCallback
 		 * @param currentBlockHeight is the of current block when callback fired.
 		 * @param progress is current progress when block height increased.
 		 */
-		virtual void OnBlockSyncProgress(uint32_t currentBlockHeight, uint32_t estimatedHeight, time_t lastBlockTime);
+		virtual void OnBlockSyncProgress(uint32_t currentBlockHeight, uint32_t estimatedHeight);
 
 		/**
 		 * Callback method fired when block end synchronizing with a peer. This callback could be used to show progress.
@@ -654,13 +654,13 @@ void ElaSubWalletCallback::OnBlockSyncStarted()
 	Detach();
 }
 
-void ElaSubWalletCallback::OnBlockSyncProgress(uint32_t currentBlockHeight, uint32_t estimatedHeight, time_t lastBlockTime)
+void ElaSubWalletCallback::OnBlockSyncProgress(uint32_t currentBlockHeight, uint32_t estimatedHeight)
 {
 	JNIEnv* env = GetEnv();
 
 	jclass clazz = env->GetObjectClass(mObj);
-	jmethodID methodId = env->GetMethodID(clazz, "OnBlockSyncProgress", "(III)V");
-	env->CallVoidMethod(mObj, methodId, currentBlockHeight, estimatedHeight, lastBlockTime);
+	jmethodID methodId = env->GetMethodID(clazz, "OnBlockSyncProgress", "(II)V");
+	env->CallVoidMethod(mObj, methodId, currentBlockHeight, estimatedHeight);
 
 	Detach();
 }
