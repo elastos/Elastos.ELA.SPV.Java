@@ -47,10 +47,9 @@ ISubWallet subWallet = masterWallet.CreateSubWallet(chainID, feePerKb);
 ### 3.6 创建主链转账交易
 String fromAddress = "";
 String toAddress = "the other address";
-long amount = 500; //ELA
+String amount = 500; //ELA
 String memo = "memo";
-String remark = "remark";
-String rawTransaction = subWallet.CreateTransaction(fromAddress, toAddress, amount, memo, remark);
+String rawTransaction = subWallet.CreateTransaction(fromAddress, toAddress, amount, memo);
 
 * 注意：创建主链转账交易时，参数fromAddress可以为空(null);
 * 注意：如果子钱包subWallet中的余额小于要转出的金额的话，会抛出WalletException　异常。
@@ -95,7 +94,7 @@ subWallet.AddCallback(new ISubWalletCallback() {
 });
 
 ### 4.2 获取ChainID和获取子钱包余额接口
-String _chainId = subWallet.GetChainId();
-long balance = subWallet.GetBalance();
+String _chainId = subWallet.GetChainID();
+String balance = subWallet.GetBalance();
 
 

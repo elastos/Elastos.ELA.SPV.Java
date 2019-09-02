@@ -10,13 +10,13 @@ import android.util.Log;
 public class IMasterWallet {
     static public class CHAINID {
         public static String MAIN = "ELA";
-        public static String ID = "IdChain";
+        public static String ID = "IDChain";
     }
 	static public String TAG = "IMasterWallet";
 
     private long mMasterProxy;
 
-    public String GetId() {
+    public String GetID() {
         return nativeGetId(mMasterProxy);
     }
 
@@ -38,7 +38,7 @@ public class IMasterWallet {
 	public ISubWallet GetSubWallet(String chainID) {
 		ArrayList<ISubWallet> subWalletList = GetAllSubWallets();
 		for (int i = 0; i < subWalletList.size(); i++) {
-			if (chainID.equals(subWalletList.get(i).GetChainId())) {
+			if (chainID.equals(subWalletList.get(i).GetChainID())) {
 				return subWalletList.get(i);
 			}
 		}
@@ -60,7 +60,7 @@ public class IMasterWallet {
 		if (CHAINID.MAIN.equals(chainID)) {
 			return new IMainchainSubWallet(subProxy);
 		} else if (CHAINID.ID.equals(chainID)) {
-			return new IIdChainSubWallet(subProxy);
+			return new IIDChainSubWallet(subProxy);
 		}
 
 		Log.e(TAG, "CreateSubWallet error: unsupport chainID = " + chainID);

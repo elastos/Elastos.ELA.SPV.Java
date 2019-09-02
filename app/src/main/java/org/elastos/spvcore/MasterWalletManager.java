@@ -80,7 +80,7 @@ public class MasterWalletManager {
 	 * @param masterWalletId master wallet id.
 	 * @return master wallet object.
 	 */
-	public IMasterWallet GetWallet(String masterWalletId) throws WalletException {
+	public IMasterWallet GetMasterWallet(String masterWalletId) throws WalletException {
 		long masterWalletProxy = nativeGetWallet(mManagerProxy, masterWalletId);
 
 		if (masterWalletProxy == 0) {
@@ -213,24 +213,17 @@ public class MasterWalletManager {
 	}
 
 	/**
-	 * Save local storage specifically. Note that the storage saving will be called automatically in destructor.
-	 */
-	public void SaveConfigs() {
-		nativeSaveConfigs(mManagerProxy);
-	}
-
-	/**
 	 * Create a multi-sign master wallet by mnemonic phrase password and related co-signers, or return existing master wallet if current master wallet manager has the master wallet id.
 	 * @param masterWallet is the unique identification of a master wallet object.
-	 * @param coSigners is an array of signers' public key
+	 * @param publicKeys is an array of signers' public key
 	 * @param requiredSignCount specify minimum count to accomplish related transactions.
 	 * @return If success will return a pointer of master wallet interface.
 	 */
 	public IMasterWallet CreateMultiSignMasterWallet(String masterWallet,
-			String coSigners, int requiredSignCount) throws WalletException {
+			String publicKeys, int m, long timestamp) throws WalletException {
 
 		long masterProxy = nativeCreateMultiSignMasterWallet(mManagerProxy, masterWallet,
-				coSigners, requiredSignCount);
+			publicKeys, m, timestamp);
 
 		if (masterProxy == 0) {
 			Log.e(TAG, "Create multi sign master wallet fail");
@@ -245,15 +238,15 @@ public class MasterWalletManager {
 	 * @param masterWallet is the unique identification of a master wallet object.
 	 * @param privKey private key to do the sign job of related multi-sign accounts.
 	 * @param payPassword use to encrypt important things(such as private key) in memory. Pay password should between 8 and 128, otherwise will throw invalid argument exception.
-	 * @param coSigners is an array of signers' public key
+	 * @param publicKeys is an array of signers' public key
 	 * @param requiredSignCount specify minimum count to accomplish related transactions.
 	 * @return If success will return a pointer of master wallet interface.
 	 */
 	public IMasterWallet CreateMultiSignMasterWallet(String masterWallet, String privKey, String payPassword,
-			String coSigners, int requiredSignCount) throws WalletException {
+		String publicKeys, int m, long timestamp) throws WalletException {
 
 		long masterProxy = nativeCreateMultiSignMasterWalletWithPrivKey(mManagerProxy, masterWallet,
-				privKey, payPassword, coSigners, requiredSignCount);
+				privKey, payPassword, publicKeys, m, timestamp);
 
 		if (masterProxy == 0) {
 			Log.e(TAG, "Create multi sign master wallet with private key fail");
@@ -269,15 +262,15 @@ public class MasterWalletManager {
 	 * @param mnemonic use to generate seed which deriving the master private key and chain code.
 	 * @param phrasePassword combine with random seed to generate root key and chain code. Phrase password can be empty or between 8 and 128, otherwise will throw invalid argument exception.
 	 * @param payPassword use to encrypt important things(such as private key) in memory. Pay password should between 8 and 128, otherwise will throw invalid argument exception.
-	 * @param coSigners is an array of signers' public key.
+	 * @param publicKeys is an array of signers' public key.
 	 * @param requiredSignCount specify minimum count to accomplish related transactions.
 	 * @return If success will return a pointer of master wallet interface.
 	 */
 	public IMasterWallet CreateMultiSignMasterWallet(String masterWalletId, String mnemonic, String phrasePassword,
-			String payPassword, String coSigners, int requiredSignCount) throws WalletException {
+			String payPassword, String publicKeys, int m, long timestamp) throws WalletException {
 
 		long masterProxy = nativeCreateMultiSignMasterWalletWithMnemonic(mManagerProxy, masterWalletId, mnemonic,
-				phrasePassword, payPassword, coSigners, requiredSignCount);
+				phrasePassword, payPassword, publicKeys, m, timestamp);
 
 		if (masterProxy == 0) {
 			Log.e(TAG, "Create multi sign master wallet with mnemonic fail");
@@ -287,19 +280,9 @@ public class MasterWalletManager {
 		return new IMasterWallet(masterProxy);
 	}
 
-	public String EncodeTransactionToString(String txJson) {
-		return nativeEncodeTransactionToString(mManagerProxy, txJson);
-	}
-
-	public String DecodeTransactionFromString(String cipher) {
-		return nativeDecodeTransactionFromString(mManagerProxy, cipher);
-	}
-
 	public String GetVersion() {
 		return nativeGetVersion(mManagerProxy);
 	}
-
-	private native void nativeSaveConfigs(long proxy);
 
 	private native String nativeGenerateMnemonic(long proxy, String language);
 
@@ -311,13 +294,13 @@ public class MasterWalletManager {
 			String phrasePassword, String payPassword, boolean singleAddress);
 
 	private native long nativeCreateMultiSignMasterWallet(long proxy, String masterWalletId,
-			String coSigners, int requiredSignCount);
+			String publicKeys, int m, long timestamp);
 
 	private native long nativeCreateMultiSignMasterWalletWithPrivKey(long proxy, String masterWalletId, String privKey,
-			String payPassword, String coSigners, int requiredSignCount);
+			String payPassword, String publicKeys, int m, long timestamp);
 
 	private native long nativeCreateMultiSignMasterWalletWithMnemonic(long proxy, String masterWalletId, String mnemonic,
-			String phrasePassword, String payPassword, String coSigners, int requiredSignCount);
+			String phrasePassword, String payPassword, String publicKeys, int m, long timestamp);
 
 	private native long nativeImportWalletWithOldKeystore(long proxy, String masterWalletId,
 			String keystoreContent, String backupPassword, String payPassword, String phrasePassword);
@@ -341,9 +324,9 @@ public class MasterWalletManager {
 
 	private native long nativeGetWallet(long proxy, String masterWalletId);
 
-	private native String nativeEncodeTransactionToString(long proxy, String txJson);
+	// private native String nativeEncodeTransactionToString(long proxy, String txJson);
 
-	private native String nativeDecodeTransactionFromString(long proxy, String cipher);
+	// private native String nativeDecodeTransactionFromString(long proxy, String cipher);
 
 	private native long nativeInitMasterWalletManager(String rootPath);
 

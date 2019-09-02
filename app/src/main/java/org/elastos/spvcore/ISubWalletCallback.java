@@ -22,19 +22,21 @@ public interface ISubWalletCallback {
      * @param currentBlockHeight is the of current block when callback fired.
      * @param estimatedHeight is max height of blockheight.
      */
-    public void OnBlockSyncProgress(int currentBlockHeight, int estimatedHeight);
+    public void OnBlockSyncProgress(int currentBlockHeight, int estimatedHeight, long lastBlockTime);
 
     /**
      * Callback method fired when block end synchronizing with a peer. This callback could be used to show progress.
      */
     public void OnBlockSyncStopped();
 
-	public void OnBalanceChanged(String asset, long balance);
+	public void OnBalanceChanged(String asset, String balance);
 
 	/**
 	 * @param result is json result
 	 */
-	public void OnTxPublished(String hash, String result);
+    public void OnTxPublished(String hash, String result);
 
-	public void OnTxDeleted(String hash, boolean notifyUser, boolean recommendRescan);
+    public void OnAssetRegistered(String asset, String info);
+
+    public void OnConnectStatusChanged(String status);
 }

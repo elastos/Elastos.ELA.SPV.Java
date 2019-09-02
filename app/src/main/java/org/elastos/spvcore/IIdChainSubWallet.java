@@ -1,21 +1,21 @@
 package org.elastos.spvcore;
 
 /**
- * IIdChainSubWallet jni
+ * IIDChainSubWallet jni
  */
-public class IIdChainSubWallet extends ISidechainSubWallet{
+public class IIDChainSubWallet extends ISidechainSubWallet{
     private long mIDchainProxy;
 
 
-    public String CreateIdTransaction(String fromAddress, String payloadJson, String programJson, String memo, String remark) throws WalletException {
-        return nativeCreateIdTransaction(mIDchainProxy, fromAddress, payloadJson, programJson, memo, remark);
+    public String CreateIDTransaction(String fromAddress, String payloadJson, String programJson, String memo) throws WalletException {
+        return nativeCreateIdTransaction(mIDchainProxy, fromAddress, payloadJson, programJson, memo);
     }
 
-    public IIdChainSubWallet(long proxy) {
+    public IIDChainSubWallet(long proxy) {
         super(proxy);
         mIDchainProxy = proxy;
     }
 
     private native String nativeCreateIdTransaction(long proxy, String fromAddress,
-            String payloadJson, String programJson, String memo, String remark);
+            String payloadJson, String programJson, String memo);
 }
