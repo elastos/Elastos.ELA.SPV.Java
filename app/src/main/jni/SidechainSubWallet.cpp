@@ -2,83 +2,83 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "ElaUtils.h"
+#include "Utils.h"
 #include "ISidechainSubWallet.h"
 #include "nlohmann/json.hpp"
 
 using namespace Elastos::ElaWallet;
 
-#define SIG_nativeCreateWithdrawTransaction "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
-static jstring JNICALL nativeCreateWithdrawTransaction(JNIEnv *env, jobject clazz, jlong jSideSubWalletProxy,
-		jstring jfromAddress,
-		jstring jamount,
-		jstring jmainChainAddress,
-		jstring jmemo)
-{
-	bool exception = false;
-	std::string msgException;
+#define JNI_CreateWithdrawTransaction "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
 
-	const char *fromAddress      = env->GetStringUTFChars(jfromAddress, NULL);
-	const char *amount = env->GetStringUTFChars(jamount, NULL);
-	const char *mainChainAddress = env->GetStringUTFChars(jmainChainAddress, NULL);
-	const char *memo             = env->GetStringUTFChars(jmemo, NULL);
+static jstring JNICALL
+CreateWithdrawTransaction(JNIEnv *env, jobject clazz, jlong jSideSubWalletProxy,
+                          jstring jfromAddress,
+                          jstring jamount,
+                          jstring jmainChainAddress,
+                          jstring jmemo) {
+    bool exception = false;
+    std::string msgException;
 
-	ISidechainSubWallet* wallet = (ISidechainSubWallet*)jSideSubWalletProxy;
-	jstring tx = NULL;
+    const char *fromAddress = env->GetStringUTFChars(jfromAddress, NULL);
+    const char *amount = env->GetStringUTFChars(jamount, NULL);
+    const char *mainChainAddress = env->GetStringUTFChars(jmainChainAddress, NULL);
+    const char *memo = env->GetStringUTFChars(jmemo, NULL);
 
-	try {
-		nlohmann::json txJson = wallet->CreateWithdrawTransaction(fromAddress, amount, mainChainAddress, memo);
+    ISidechainSubWallet *wallet = (ISidechainSubWallet *) jSideSubWalletProxy;
+    jstring tx = NULL;
 
-		tx = env->NewStringUTF(txJson.dump().c_str());
-	} catch (std::exception &e) {
-		exception = true;
-		msgException = e.what();
-	}
+    try {
+        nlohmann::json txJson = wallet->CreateWithdrawTransaction(fromAddress, amount,
+                                                                  mainChainAddress, memo);
 
-	env->ReleaseStringUTFChars(jfromAddress, fromAddress);
-	env->ReleaseStringUTFChars(jamount, amount);
-	env->ReleaseStringUTFChars(jmainChainAddress, mainChainAddress);
-	env->ReleaseStringUTFChars(jmemo, memo);
+        tx = env->NewStringUTF(txJson.dump().c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
 
-	if (exception) {
-		ThrowWalletException(env, msgException.c_str());
-	}
+    env->ReleaseStringUTFChars(jfromAddress, fromAddress);
+    env->ReleaseStringUTFChars(jamount, amount);
+    env->ReleaseStringUTFChars(jmainChainAddress, mainChainAddress);
+    env->ReleaseStringUTFChars(jmemo, memo);
 
-	return tx;
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return tx;
 }
 
-#define SIG_nativeGetGenesisAddress "(J)Ljava/lang/String;"
-static jstring JNICALL nativeGetGenesisAddress(JNIEnv *env, jobject clazz, jlong jSideSubWalletProxy)
-{
-	bool exception = false;
-	std::string msgException;
+#define JNI_GetGenesisAddress "(J)Ljava/lang/String;"
 
-	ISidechainSubWallet *wallet = (ISidechainSubWallet *)jSideSubWalletProxy;
-	jstring addr = NULL;
+static jstring JNICALL GetGenesisAddress(JNIEnv *env, jobject clazz, jlong jSideSubWalletProxy) {
+    bool exception = false;
+    std::string msgException;
 
-	try {
-		std::string address = wallet->GetGenesisAddress();
-		addr = env->NewStringUTF(address.c_str());
-	} catch (std::exception &e) {
-		exception = true;
-		msgException = e.what();
-	}
+    ISidechainSubWallet *wallet = (ISidechainSubWallet *) jSideSubWalletProxy;
+    jstring addr = NULL;
 
-	if (exception) {
-		ThrowWalletException(env, msgException.c_str());
-	}
+    try {
+        std::string address = wallet->GetGenesisAddress();
+        addr = env->NewStringUTF(address.c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
 
-	return addr;
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return addr;
 }
 
 
-static const JNINativeMethod gMethods[] = {
-	REGISTER_METHOD(nativeCreateWithdrawTransaction),
-	REGISTER_METHOD(nativeGetGenesisAddress),
+static const JNINativeMethod methods[] = {
+        REGISTER_METHOD(CreateWithdrawTransaction),
+        REGISTER_METHOD(GetGenesisAddress),
 };
 
-jint register_elastos_spv_ISidechainSubWallet(JNIEnv *env)
-{
-	return jniRegisterNativeMethods(env, "org/elastos/spvcore/ISidechainSubWallet",
-			gMethods, NELEM(gMethods));
+jint RegisterSidechainSubWallet(JNIEnv *env, const std::string &path) {
+    return RegisterNativeMethods(env, path + "SidechainSubWallet", methods, NELEM(methods));
 }

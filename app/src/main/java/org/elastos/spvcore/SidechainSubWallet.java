@@ -1,25 +1,29 @@
+// Copyright (c) 2012-2019 The Elastos Open Source Project
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 package org.elastos.spvcore;
 
 /**
  * ISidechainSubWallet jni
  */
-public class ISidechainSubWallet extends ISubWallet {
-    private long mSidechainProxy;
+public class SidechainSubWallet extends SubWallet {
+    private long mInstance;
 
     public String CreateWithdrawTransaction(String fromAddress, String amount, String mainChainAddress, String memo) throws WalletException {
-        return nativeCreateWithdrawTransaction(mSidechainProxy, fromAddress, amount, mainChainAddress, memo);
+        return CreateWithdrawTransaction(mInstance, fromAddress, amount, mainChainAddress, memo);
     }
 
     public String GetGenesisAddress() throws WalletException {
-        return nativeGetGenesisAddress(mSidechainProxy);
+        return GetGenesisAddress(mInstance);
     }
 
-    public ISidechainSubWallet(long proxy) {
+    public SidechainSubWallet(long proxy) {
         super(proxy);
-        mSidechainProxy = proxy;
+        mInstance = proxy;
     }
 
-    private native String nativeCreateWithdrawTransaction(long proxy, String fromAddress, String amount, String mainChainAddress, String memo);
+    private native String CreateWithdrawTransaction(long proxy, String fromAddress, String amount, String mainChainAddress, String memo);
 
-    private native String nativeGetGenesisAddress(long proxy);
+    private native String GetGenesisAddress(long proxy);
 }

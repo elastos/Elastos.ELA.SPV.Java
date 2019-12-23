@@ -5,33 +5,33 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
+file(GLOB_RECURSE CPP_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/main/jni/*.cpp)
+
+include_directories(
+        src/main/jni/
+        src/main/jni/include
+)
+
+link_directories(
+        libs/armeabi-v7a
+        libs/arm64-v8a
+        libs/x86
+        libs/x86_64
+)
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
-include_directories(src/main/jni/did/include)
-include_directories(src/main/jni/wallet/include)
-link_directories(libs/armeabi-v7a libs/arm64-v8a libs/x86 libs/x86_64)
-
 add_library( # Sets the name of the library.
-             elastoswallet
+        spvsdk_jni
 
-             # Sets the library as a shared library.
-             SHARED
+        # Sets the library as a shared library.
+        SHARED
 
-             # Provides a relative path to your source file(s).
-             src/main/jni/ElaSpv.cpp
-             src/main/jni/ElaMasterWalletManager.cpp
-             src/main/jni/ElaMasterWallet.cpp
-             src/main/jni/ElaSubWallet.cpp
-             src/main/jni/ElaMainchainSubWallet.cpp
-             src/main/jni/ElaSidechainSubWallet.cpp
-             src/main/jni/ElaIdChainSubWallet.cpp
-			 src/main/jni/ElaDIDManagerSupervisor.cpp
-             src/main/jni/ElaDidManager.cpp
-             src/main/jni/ElaDid.cpp
-             src/main/jni/ElaUtils.cpp)
+        # Provides a relative path to your source file(s).
+        ${CPP_SOURCE_FILES})
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -40,21 +40,18 @@ add_library( # Sets the name of the library.
 # completing its build.
 
 find_library( # Sets the name of the path variable.
-              log-lib
-
-              # Specifies the name of the NDK library that
-              # you want CMake to locate.
-              log )
+        log-lib
+        # Specifies the name of the NDK library that
+        # you want CMake to locate.
+        log )
 
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-                       elastoswallet
-                       spvsdk
-                       #idchain
-
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib} )
+        spvsdk_jni
+        spvsdk
+        # Links the target library to the log library
+        # included in the NDK.
+        ${log-lib} )

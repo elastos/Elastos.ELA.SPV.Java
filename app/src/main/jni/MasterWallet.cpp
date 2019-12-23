@@ -2,303 +2,495 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "ElaUtils.h"
+#include "Utils.h"
 #include "IMasterWallet.h"
 #include "nlohmann/json.hpp"
 
 using namespace Elastos::ElaWallet;
-#define CLASS_MCSUBWALLET   "org/elastos/spvcore/IMainchainSubWallet"
-#define CLASS_IDSUBWALLET   "org/elastos/spvcore/IIDChainSubWallet"
-#define CHAINID_MAINCHAIN "ELA"
-#define CHAINID_IDCHAIN "IDChain"
+const std::string CLASS_MCSUBWALLET = CLASS_PACKAGE_PATH + "MainchainSubWallet";
+const std::string CLASS_IDSUBWALLET = CLASS_PACKAGE_PATH + "IDChainSubWallet";
+const std::string CHAINID_MAINCHAIN = "ELA";
+const std::string CHAINID_IDCHAIN = "IDChain";
 
-#define SIG_nativeGetId "(J)Ljava/lang/String;"
-static jstring JNICALL nativeGetId(JNIEnv *env, jobject clazz, jlong jMasterProxy)
-{
-	jstring id = NULL;
-	try {
-		IMasterWallet *masterWallet = (IMasterWallet *)jMasterProxy;
-		std::string key = masterWallet->GetID();
-		id = env->NewStringUTF(key.c_str());
-	} catch (std::exception &e) {
-		ThrowWalletException(env, e.what());
-	}
+#define JNI_GetID "(J)Ljava/lang/String;"
 
-	return id;
+static jstring JNICALL GetID(JNIEnv *env, jobject clazz, jlong instance) {
+    jstring id = NULL;
+    try {
+        IMasterWallet *masterWallet = (IMasterWallet *) instance;
+        std::string key = masterWallet->GetID();
+        id = env->NewStringUTF(key.c_str());
+    } catch (const std::exception &e) {
+        ThrowWalletException(env, e.what());
+    }
+
+    return id;
 }
 
-#define SIG_nativeGetBasicInfo "(J)Ljava/lang/String;"
-static jstring JNICALL nativeGetBasicInfo(JNIEnv *env, jobject clazz, jlong jMasterProxy)
-{
-	IMasterWallet *masterWallet = (IMasterWallet *)jMasterProxy;
-	jstring info = NULL;
+#define JNI_GetBasicInfo "(J)Ljava/lang/String;"
 
-	try {
-		nlohmann::json basicInfo = masterWallet->GetBasicInfo();
-		info = env->NewStringUTF(basicInfo.dump().c_str());
-	} catch (std::exception &e) {
-		ThrowWalletException(env, e.what());
-	}
+static jstring JNICALL GetBasicInfo(JNIEnv *env, jobject clazz, jlong instance) {
+    IMasterWallet *masterWallet = (IMasterWallet *) instance;
+    jstring info = NULL;
 
-	return info;
+    try {
+        nlohmann::json basicInfo = masterWallet->GetBasicInfo();
+        info = env->NewStringUTF(basicInfo.dump().c_str());
+    } catch (const std::exception &e) {
+        ThrowWalletException(env, e.what());
+    }
+
+    return info;
 }
 
-#define SIG_nativeGetAllSubWallets "(J)[Ljava/lang/Object;"
-static jobjectArray JNICALL nativeGetAllSubWallets(JNIEnv *env, jobject clazz, jlong jMasterProxy)
-{
-	try {
-		IMasterWallet* masterWallet = (IMasterWallet*)jMasterProxy;
-		std::vector<ISubWallet *> allSubWallets = masterWallet->GetAllSubWallets();
+#define JNI_GetAllSubWallets "(J)[Ljava/lang/Object;"
 
-		jclass clazzSubWallet;
-		jmethodID subWalletConstructor;
-		jobject subWallet;
+static jobjectArray JNICALL GetAllSubWallets(JNIEnv *env, jobject clazz, jlong instance) {
+    try {
+        IMasterWallet *masterWallet = (IMasterWallet *) instance;
+        std::vector<ISubWallet *> allSubWallets = masterWallet->GetAllSubWallets();
 
-		jclass clazzObject = env->FindClass("java/lang/Object");
-		jobjectArray subWalletArray = env->NewObjectArray(allSubWallets.size(), clazzObject, NULL);
+        jclass clazzSubWallet;
+        jmethodID subWalletConstructor;
+        jobject subWallet;
 
-		for (int i = 0; i < allSubWallets.size(); i++) {
-			std::string id = allSubWallets[i]->GetChainID();
-			if (id == CHAINID_MAINCHAIN) {
-				clazzSubWallet = env->FindClass(CLASS_MCSUBWALLET);
-				subWalletConstructor = env->GetMethodID(clazzSubWallet, "<init>", "(J)V");
-				subWallet = env->NewObject(clazzSubWallet, subWalletConstructor, (jlong) allSubWallets[i]);
-				env->SetObjectArrayElement(subWalletArray, i, subWallet);
-			} else if (id == CHAINID_IDCHAIN) {
-				clazzSubWallet = env->FindClass(CLASS_IDSUBWALLET);
-				subWalletConstructor = env->GetMethodID(clazzSubWallet, "<init>", "(J)V");
-				subWallet = env->NewObject(clazzSubWallet, subWalletConstructor, (jlong) allSubWallets[i]);
-				env->SetObjectArrayElement(subWalletArray, i, subWallet);
-			} else {
-				ThrowWalletException(env, "Unknow chain id");
-				return NULL;
-			}
-		}
+        jclass clazzObject = env->FindClass("java/lang/Object");
+        jobjectArray subWalletArray = env->NewObjectArray(allSubWallets.size(), clazzObject, NULL);
 
-		return subWalletArray;
-	} catch (std::exception &e) {
-		ThrowWalletException(env, e.what());
-		return NULL;
-	}
+        for (int i = 0; i < allSubWallets.size(); i++) {
+            std::string id = allSubWallets[i]->GetChainID();
+            if (id == CHAINID_MAINCHAIN) {
+                clazzSubWallet = env->FindClass(CLASS_MCSUBWALLET.c_str());
+                subWalletConstructor = env->GetMethodID(clazzSubWallet, "<init>", "(J)V");
+                subWallet = env->NewObject(clazzSubWallet, subWalletConstructor,
+                                           (jlong) allSubWallets[i]);
+                env->SetObjectArrayElement(subWalletArray, i, subWallet);
+            } else if (id == CHAINID_IDCHAIN) {
+                clazzSubWallet = env->FindClass(CLASS_IDSUBWALLET.c_str());
+                subWalletConstructor = env->GetMethodID(clazzSubWallet, "<init>", "(J)V");
+                subWallet = env->NewObject(clazzSubWallet, subWalletConstructor,
+                                           (jlong) allSubWallets[i]);
+                env->SetObjectArrayElement(subWalletArray, i, subWallet);
+            } else {
+                ThrowWalletException(env, "Unknow chain id");
+                return NULL;
+            }
+        }
+
+        return subWalletArray;
+    } catch (const std::exception &e) {
+        ThrowWalletException(env, e.what());
+        return NULL;
+    }
 }
 
-#define SIG_nativeCreateSubWallet "(JLjava/lang/String;J)J"
-static jlong JNICALL nativeCreateSubWallet(JNIEnv *env, jobject clazz, jlong jMasterProxy,
-		jstring jChainID,
-		jlong jFeePerKb)
-{
-	bool exception = false;
-	std::string msgException;
+#define JNI_GetSubWallet "(JLjava/lang/String;)J"
 
-	const char* chainID = env->GetStringUTFChars(jChainID, NULL);
+static jlong JNICALL GetSubWallet(JNIEnv *env, jobject clazz, jlong instance, jstring jChainID) {
 
-	IMasterWallet *masterWallet = (IMasterWallet *)jMasterProxy;
-	ISubWallet *subWallet = NULL;
+    bool exception = false;
+    std::string msgException;
+    ISubWallet *subWallet = NULL;
 
-	try {
-		subWallet = masterWallet->CreateSubWallet(chainID, jFeePerKb);
-	} catch (std::exception& e) {
-		exception = true;
-		msgException = e.what();
-	}
+    const char *chainID = env->GetStringUTFChars(jChainID, NULL);
 
-	env->ReleaseStringUTFChars(jChainID, chainID);
+    IMasterWallet *masterWallet = (IMasterWallet *) instance;
+    try {
+        subWallet = masterWallet->GetSubWallet(chainID);
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
 
-	if (exception) {
-		ThrowWalletException(env, msgException.c_str());
-	}
+    env->ReleaseStringUTFChars(jChainID, chainID);
 
-	return (jlong)subWallet;
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return (jlong) subWallet;
 }
 
-#define SIG_nativeDestroyWallet "(JJ)V"
-static void JNICALL nativeDestroyWallet(JNIEnv *env, jobject clazz, jlong jMasterProxy,
-		jlong jsubWalletProxy)
-{
-	try {
-		IMasterWallet *masterWallet = (IMasterWallet *)jMasterProxy;
-		ISubWallet *subWallet = (ISubWallet *)jsubWalletProxy;
-		masterWallet->DestroyWallet(subWallet);
-	} catch (std::exception &e) {
-		ThrowWalletException(env, e.what());
-	}
+#define JNI_CreateSubWallet "(JLjava/lang/String;)J"
+
+static jlong JNICALL CreateSubWallet(JNIEnv *env, jobject clazz, jlong instance, jstring jChainID) {
+
+    bool exception = false;
+    std::string msgException;
+
+    const char *chainID = env->GetStringUTFChars(jChainID, NULL);
+
+    IMasterWallet *masterWallet = (IMasterWallet *) instance;
+    ISubWallet *subWallet = NULL;
+
+    try {
+        subWallet = masterWallet->CreateSubWallet(chainID);
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jChainID, chainID);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return (jlong) subWallet;
 }
 
-#define SIG_nativeGetPublicKey "(J)Ljava/lang/String;"
-static jstring JNICALL nativeGetPublicKey(JNIEnv *env, jobject clazz, jlong jMasterProxy)
-{
-	jstring key = NULL;
+#define JNI_DestroyWallet "(JLjava/lang/String;)V"
 
-	try {
-		IMasterWallet *masterWallet = (IMasterWallet *)jMasterProxy;
-		std::string k = masterWallet->GetPublicKey();
-		key = env->NewStringUTF(k.c_str());
-	} catch (std::exception &e) {
-		ThrowWalletException(env, e.what());
-	}
+static void JNICALL DestroyWallet(JNIEnv *env, jobject clazz, jlong jMasterInstance,
+                                  jstring jchainID) {
+    bool exception = false;
+    std::string msgException;
 
-	return key;
+    const char *chainID = env->GetStringUTFChars(jchainID, NULL);
+
+    try {
+        IMasterWallet *masterWallet = (IMasterWallet *) jMasterInstance;
+        masterWallet->DestroyWallet(chainID);
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jchainID, chainID);
+
+    if (exception)
+        ThrowWalletException(env, msgException.c_str());
 }
 
-#define SIG_nativeSign "(JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
-static jstring JNICALL nativeSign(JNIEnv *env, jobject clazz, jlong jMasterProxy,
-		jstring jmessage,
-		jstring jpayPassword)
-{
-	bool exception = false;
-	std::string msgException;
+#define JNI_GetPubKeyInfo "(J)Ljava/lang/String;"
 
-	const char* message = env->GetStringUTFChars(jmessage, NULL);
-	const char* payPassword = env->GetStringUTFChars(jpayPassword, NULL);
+static jstring JNICALL GetPubKeyInfo(JNIEnv *env, jobject clazz, jlong instance) {
+    jstring info = NULL;
 
-	IMasterWallet* masterWallet = (IMasterWallet*)jMasterProxy;
-	jstring result = NULL;
+    try {
+        IMasterWallet *masterWallet = (IMasterWallet *) instance;
+        nlohmann::json k = masterWallet->GetPubKeyInfo();
+        info = env->NewStringUTF(k.dump().c_str());
+    } catch (const std::exception &e) {
+        ThrowWalletException(env, e.what());
+    }
 
-	try {
-		std::string r = masterWallet->Sign(message, payPassword);
-		result = env->NewStringUTF(r.c_str());
-	} catch (std::exception& e) {
-		exception = true;
-		msgException = e.what();
-	}
-
-	env->ReleaseStringUTFChars(jmessage, message);
-	env->ReleaseStringUTFChars(jpayPassword, payPassword);
-
-	if (exception) {
-		ThrowWalletException(env, msgException.c_str());
-	}
-
-	return result;
+    return info;
 }
 
-#define SIG_nativeCheckSign "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z"
-static jboolean JNICALL nativeCheckSign(JNIEnv *env, jobject clazz, jlong jMasterProxy,
-		jstring jaddress,
-		jstring jmessage,
-		jstring jsignature)
-{
-	bool exception = false;
-	std::string msgException;
+#define JNI_IsAddressValid "(JLjava/lang/String;)Z"
 
-	const char* address = env->GetStringUTFChars(jaddress, NULL);
-	const char* message = env->GetStringUTFChars(jmessage, NULL);
-	const char* signature = env->GetStringUTFChars(jsignature, NULL);
+static jboolean JNICALL
+IsAddressValid(JNIEnv *env, jobject clazz, jlong instance, jstring jaddress) {
+    bool exception = false;
+    std::string msgException;
 
-	IMasterWallet *masterWallet = (IMasterWallet *)jMasterProxy;
-	jboolean result = false;
+    const char *address = env->GetStringUTFChars(jaddress, NULL);
 
-	try {
-		result = masterWallet->CheckSign(address, message, signature);
-	} catch (std::exception &e) {
-		exception = true;
-		msgException = e.what();
-	}
+    IMasterWallet *masterWallet = (IMasterWallet *) instance;
+    bool valid = false;
 
-	env->ReleaseStringUTFChars(jaddress, address);
-	env->ReleaseStringUTFChars(jmessage, message);
-	env->ReleaseStringUTFChars(jsignature, signature);
+    try {
+        valid = masterWallet->IsAddressValid(address);
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
 
-	if (exception) {
-		ThrowWalletException(env, msgException.c_str());
-	}
+    env->ReleaseStringUTFChars(jaddress, address);
 
-	return result;
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return (jboolean) valid;
 }
 
-#define SIG_nativeIsAddressValid "(JLjava/lang/String;)Z"
-static jboolean JNICALL nativeIsAddressValid(JNIEnv *env, jobject clazz, jlong jMasterProxy, jstring jaddress)
-{
-	bool exception = false;
-	std::string msgException;
+#define JNI_GetSupportedChains "(J)[Ljava/lang/String;"
 
-	const char* address = env->GetStringUTFChars(jaddress, NULL);
+static jobjectArray JNICALL GetSupportedChains(JNIEnv *env, jobject clazz, jlong instance) {
+    IMasterWallet *masterWallet = (IMasterWallet *) instance;
+    std::vector<std::string> chains;
 
-	IMasterWallet *masterWallet = (IMasterWallet*)jMasterProxy;
-	bool valid = false;
+    try {
+        chains = masterWallet->GetSupportedChains();
+    } catch (const std::exception &e) {
+        ThrowWalletException(env, e.what());
+        return NULL;
+    }
 
-	try {
-		valid = masterWallet->IsAddressValid(address);
-	} catch (std::exception &e) {
-		exception = true;
-		msgException = e.what();
-	}
+    jclass objClass = env->FindClass("java/lang/String");
+    jobjectArray objArray = env->NewObjectArray(chains.size(), objClass, 0);
+    for (int i = 0; i < chains.size(); ++i) {
+        env->SetObjectArrayElement(objArray, i, env->NewStringUTF(chains[i].c_str()));
+    }
 
-	env->ReleaseStringUTFChars(jaddress, address);
-
-	if (exception) {
-		ThrowWalletException(env, msgException.c_str());
-	}
-
-	return (jboolean)valid;
+    return objArray;
 }
 
-#define SIG_nativeGetSupportedChains "(J)[Ljava/lang/String;"
-static jobjectArray JNICALL nativeGetSupportedChains(JNIEnv *env, jobject clazz, jlong jMasterProxy)
-{
-	IMasterWallet* masterWallet = (IMasterWallet*)jMasterProxy;
-	std::vector<std::string> chains;
+#define JNI_ChangePassword "(JLjava/lang/String;Ljava/lang/String;)V"
 
-	try {
-		chains = masterWallet->GetSupportedChains();
-	} catch (std::exception &e) {
-		ThrowWalletException(env, e.what());
-		return NULL;
-	}
+static void JNICALL
+ChangePassword(JNIEnv *env, jobject clazz, jlong instance, jstring joldPassword,
+               jstring jnewPassword) {
+    bool exception = false;
+    std::string msgException;
 
-	jclass objClass = env->FindClass("java/lang/String");
-	jobjectArray objArray = env->NewObjectArray(chains.size(), objClass, 0);
-	for (int i = 0; i < chains.size(); ++i) {
-		env->SetObjectArrayElement(objArray, i, env->NewStringUTF(chains[i].c_str()));
-	}
+    const char *oldPassword = env->GetStringUTFChars(joldPassword, NULL);
+    const char *newPassword = env->GetStringUTFChars(jnewPassword, NULL);
 
-	return objArray;
+    IMasterWallet *masterWallet = (IMasterWallet *) instance;
+
+    try {
+        masterWallet->ChangePassword(oldPassword, newPassword);
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(joldPassword, oldPassword);
+    env->ReleaseStringUTFChars(jnewPassword, newPassword);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
 }
 
-#define SIG_nativeChangePassword "(JLjava/lang/String;Ljava/lang/String;)V"
-static void JNICALL nativeChangePassword(JNIEnv *env, jobject clazz, jlong jMasterProxy, jstring joldPassword, jstring jnewPassword)
-{
-	bool exception = false;
-	std::string msgException;
+#define JNI_VerifyPrivateKey "(JLjava/lang/String;Ljava/lang/String;)Z"
 
-	const char *oldPassword = env->GetStringUTFChars(joldPassword, NULL);
-	const char *newPassword = env->GetStringUTFChars(jnewPassword, NULL);
+static jboolean JNICALL
+VerifyPrivateKey(JNIEnv *env, jobject clazz, jlong instance, jstring jmnemonic,
+                 jstring jpassphrase) {
+    bool exception = false;
+    std::string msgException;
+    bool valid = false;
 
-	IMasterWallet *masterWallet = (IMasterWallet*)jMasterProxy;
+    const char *mnemonic = env->GetStringUTFChars(jmnemonic, NULL);
+    const char *passphrase = env->GetStringUTFChars(jpassphrase, NULL);
 
-	try {
-		masterWallet->ChangePassword(oldPassword, newPassword);
-	} catch (std::exception& e) {
-		exception = true;
-		msgException = e.what();
-	}
+    IMasterWallet *masterWallet = (IMasterWallet *) instance;
 
-	env->ReleaseStringUTFChars(joldPassword, oldPassword);
-	env->ReleaseStringUTFChars(jnewPassword, newPassword);
+    try {
+        valid = masterWallet->VerifyPrivateKey(mnemonic, passphrase);
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
 
-	if (exception) {
-		ThrowWalletException(env, msgException.c_str());
-	}
+    env->ReleaseStringUTFChars(jmnemonic, mnemonic);
+    env->ReleaseStringUTFChars(jpassphrase, passphrase);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return (jboolean) valid;
 }
 
-static const JNINativeMethod gMethods[] = {
-	REGISTER_METHOD(nativeGetId),
-	REGISTER_METHOD(nativeGetBasicInfo),
-	REGISTER_METHOD(nativeGetAllSubWallets),
-	REGISTER_METHOD(nativeCreateSubWallet),
-	REGISTER_METHOD(nativeDestroyWallet),
-	REGISTER_METHOD(nativeGetPublicKey),
-	REGISTER_METHOD(nativeSign),
-	REGISTER_METHOD(nativeCheckSign),
-	REGISTER_METHOD(nativeIsAddressValid),
-	REGISTER_METHOD(nativeGetSupportedChains),
-	REGISTER_METHOD(nativeChangePassword),
+#define JNI_VerifyPassPhrase "(JLjava/lang/String;Ljava/lang/String;)Z"
+
+static jboolean JNICALL VerifyPassPhrase(JNIEnv *env, jobject clazz, jlong instance,
+                                         jstring jpassphrase, jstring jpayPasswd) {
+    bool exception = false;
+    std::string msgException;
+    bool valid = false;
+
+    const char *passphrase = env->GetStringUTFChars(jpassphrase, NULL);
+    const char *payPasswd = env->GetStringUTFChars(jpayPasswd, NULL);
+
+    IMasterWallet *masterWallet = (IMasterWallet *) instance;
+
+    try {
+        valid = masterWallet->VerifyPassPhrase(passphrase, payPasswd);
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jpassphrase, passphrase);
+    env->ReleaseStringUTFChars(jpayPasswd, payPasswd);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return (jboolean) valid;
+}
+
+#define JNI_VerifyPayPassword "(JLjava/lang/String;)Z"
+
+static jboolean JNICALL
+VerifyPayPassword(JNIEnv *env, jobject clazz, jlong instance, jstring jpayPasswd) {
+    bool exception = false;
+    std::string msgException;
+    bool valid = false;
+
+    const char *payPasswd = env->GetStringUTFChars(jpayPasswd, NULL);
+
+    IMasterWallet *masterWallet = (IMasterWallet *) instance;
+
+    try {
+        valid = masterWallet->VerifyPayPassword(payPasswd);
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jpayPasswd, payPasswd);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return (jboolean) valid;
+}
+
+#define JNI_ExportKeystore "(JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL ExportKeystore(JNIEnv *env, jobject clazz, jlong instance,
+                                      jstring jbackPassword,
+                                      jstring jpayPassword) {
+    bool exception = false;
+    std::string msgException;
+    jstring result = NULL;
+
+    const char *backPassword = env->GetStringUTFChars(jbackPassword, NULL);
+    const char *payPassword = env->GetStringUTFChars(jpayPassword, NULL);
+
+    IMasterWallet *masterWallet = (IMasterWallet *) instance;
+
+    try {
+        nlohmann::json keyStore = masterWallet->ExportKeystore(backPassword, payPassword);
+        result = env->NewStringUTF(keyStore.dump().c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jbackPassword, backPassword);
+    env->ReleaseStringUTFChars(jpayPassword, payPassword);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return result;
+}
+
+#define JNI_ExportMnemonic "(JLjava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL ExportMnemonic(JNIEnv *env, jobject clazz, jlong instance,
+                                      jstring jpayPassword) {
+    bool exception = false;
+    std::string msgException;
+    jstring jmnemonic = NULL;
+
+    const char *payPassword = env->GetStringUTFChars(jpayPassword, NULL);
+
+    IMasterWallet *masterWallet = (IMasterWallet *) instance;
+
+    try {
+        std::string result = masterWallet->ExportMnemonic(payPassword);
+        jmnemonic = env->NewStringUTF(result.c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jpayPassword, payPassword);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return jmnemonic;
+}
+
+#define JNI_ExportReadonlyWallet "(J)Ljava/lang/String;"
+
+static jstring JNICALL ExportReadonlyWallet(JNIEnv *env, jobject clazz, jlong instance) {
+    jstring result = NULL;
+
+    IMasterWallet *masterWallet = (IMasterWallet *) instance;
+
+    try {
+        nlohmann::json j = masterWallet->ExportReadonlyWallet();
+        result = env->NewStringUTF(j.dump().c_str());
+    } catch (const std::exception &e) {
+        ThrowWalletException(env, e.what());
+    }
+
+    return result;
+}
+
+#define JNI_ExportPrivateKey "(JLjava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL ExportPrivateKey(JNIEnv *env, jobject clazz, jlong instance,
+                                        jstring jpayPassword) {
+    bool exception = false;
+    std::string msgException;
+    jstring result = NULL;
+
+    const char *payPassword = env->GetStringUTFChars(jpayPassword, NULL);
+
+    IMasterWallet *masterWallet = (IMasterWallet *) instance;
+
+    try {
+        std::string privateKey = masterWallet->ExportPrivateKey(payPassword);
+        result = env->NewStringUTF(privateKey.c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jpayPassword, payPassword);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return result;
+}
+
+#define JNI_ExportMasterPublicKey "(J)Ljava/lang/String;"
+
+static jstring JNICALL ExportMasterPublicKey(JNIEnv *env, jobject clazz, jlong instance) {
+    jstring result = NULL;
+
+    IMasterWallet *masterWallet = (IMasterWallet *) instance;
+
+    try {
+        std::string pubKey = masterWallet->ExportMasterPublicKey();
+        result = env->NewStringUTF(pubKey.c_str());
+    } catch (const std::exception &e) {
+        ThrowWalletException(env, e.what());
+    }
+
+    return result;
+}
+
+static const JNINativeMethod methods[] = {
+        REGISTER_METHOD(GetID),
+        REGISTER_METHOD(GetBasicInfo),
+        REGISTER_METHOD(GetAllSubWallets),
+        REGISTER_METHOD(GetSubWallet),
+        REGISTER_METHOD(CreateSubWallet),
+        REGISTER_METHOD(DestroyWallet),
+        REGISTER_METHOD(IsAddressValid),
+        REGISTER_METHOD(GetSupportedChains),
+        REGISTER_METHOD(ChangePassword),
+        REGISTER_METHOD(GetPubKeyInfo),
+        REGISTER_METHOD(VerifyPrivateKey),
+        REGISTER_METHOD(VerifyPassPhrase),
+        REGISTER_METHOD(VerifyPayPassword),
+        REGISTER_METHOD(ExportKeystore),
+        REGISTER_METHOD(ExportMnemonic),
+        REGISTER_METHOD(ExportReadonlyWallet),
+        REGISTER_METHOD(ExportPrivateKey),
+        REGISTER_METHOD(ExportMasterPublicKey),
 };
 
-jint register_elastos_spv_IMasterWallet(JNIEnv *env)
-{
-	return jniRegisterNativeMethods(env,
-			"org/elastos/spvcore/IMasterWallet",
-			gMethods, NELEM(gMethods));
+jint RegisterMasterWallet(JNIEnv *env, const std::string &path) {
+    return RegisterNativeMethods(env, path + "MasterWallet", methods, NELEM(methods));
 }
 

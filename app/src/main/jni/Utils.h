@@ -9,39 +9,38 @@
 #include <string>
 #include <android/log.h>
 
-#define TAG "Wallet.jni"
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,TAG ,__VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,TAG ,__VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN,TAG ,__VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__)
-#define LOGF(...) __android_log_print(ANDROID_LOG_FATAL,TAG ,__VA_ARGS__)
+#define LOGD(tag, ...) __android_log_print(ANDROID_LOG_DEBUG, tag, __VA_ARGS__)
+#define LOGI(tag, ...) __android_log_print(ANDROID_LOG_INFO,  tag, __VA_ARGS__)
+#define LOGW(tag, ...) __android_log_print(ANDROID_LOG_WARN,  tag, __VA_ARGS__)
+#define LOGE(tag, ...) __android_log_print(ANDROID_LOG_ERROR, tag, __VA_ARGS__)
+#define LOGF(tag, ...) __android_log_print(ANDROID_LOG_FATAL, tag, __VA_ARGS__)
 
 #ifndef NELEM
 # define NELEM(x) ((int) (sizeof(x) / sizeof((x)[0])))
 #endif
 
-//#define ENABLE_DID
-#define REGISTER_METHOD(name) { #name, SIG_##name, (void *)name }
+#define REGISTER_METHOD(name) { #name, JNI_##name, (void *)name }
 
-int jniRegisterNativeMethods(JNIEnv* env, const char* className, const JNINativeMethod* gMethods, int numMethods);
+#define CLASS_PACKAGE_PATH std::string("org/elastos/spvcore/")
 
-void CheckErrorAndLog(
-    /* [in] */ JNIEnv* env,
-    /* [in] */ const char* errlog,
-    /* [in] */ int line);
+int RegisterNativeMethods(JNIEnv *env, const std::string &className, const JNINativeMethod *methods,
+                          int numMethods);
 
 void CheckErrorAndLog(
-    /* [in] */ JNIEnv* env,
-    /* [in] */ const char* errlog,
-    /* [in] */ const char* paramname,
-    /* [in] */ int line);
+        /* [in] */ JNIEnv *env,
+        /* [in] */ const char *errlog,
+        /* [in] */ int line);
 
-jlong GetJavaLongField(JNIEnv* env, jclass klass, jobject jobj, const char* fieldName);
+void CheckErrorAndLog(
+        /* [in] */ JNIEnv *env,
+        /* [in] */ const char *errlog,
+        /* [in] */ const char *paramname,
+        /* [in] */ int line);
 
-void ThrowWalletException(JNIEnv* env, const char* errorInfo);
-void ThrowWalletExceptionWithECode(JNIEnv* env, int errorcode, const char* errorInfo);
+jlong GetJavaLongField(JNIEnv *env, jclass klass, jobject jobj, const std::string &fieldName);
 
-//If NewStringUTF has running error, need to use the method.
-jstring stringTojstring(JNIEnv* env, std::string str);
+void ThrowWalletException(JNIEnv *env, const char *errorInfo);
+
+void ThrowWalletExceptionWithECode(JNIEnv *env, int errorcode, const char *errorInfo);
 
 #endif  // __ELASTOS_WALLET_JNI_UTILS_H__

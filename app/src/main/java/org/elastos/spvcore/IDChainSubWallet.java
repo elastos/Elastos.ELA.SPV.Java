@@ -1,21 +1,65 @@
+// Copyright (c) 2012-2019 The Elastos Open Source Project
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 package org.elastos.spvcore;
 
 /**
- * IIDChainSubWallet jni
+ * IDChainSubWallet jni
  */
-public class IIDChainSubWallet extends ISidechainSubWallet{
-    private long mIDchainProxy;
+public class IDChainSubWallet extends SidechainSubWallet {
+    private long mInstance;
 
-
-    public String CreateIDTransaction(String fromAddress, String payloadJson, String programJson, String memo) throws WalletException {
-        return nativeCreateIdTransaction(mIDchainProxy, fromAddress, payloadJson, programJson, memo);
+    public String CreateIDTransaction(String payloadJson, String memo) throws WalletException {
+        return CreateIDTransaction(mInstance, payloadJson, memo);
     }
 
-    public IIDChainSubWallet(long proxy) {
-        super(proxy);
-        mIDchainProxy = proxy;
+    public String GenerateDIDInfoPayload(String inputJson, String passwd) throws WalletException {
+        return GenerateDIDInfoPayload(mInstance, inputJson, passwd);
     }
 
-    private native String nativeCreateIdTransaction(long proxy, String fromAddress,
-            String payloadJson, String programJson, String memo);
+    public String GetAllDID(int start, int count) throws WalletException {
+        return GetAllDID(mInstance, start, count);
+    }
+
+    public String Sign(String did, String message, String payPassword) throws WalletException {
+        return Sign(mInstance, did, message, payPassword);
+    }
+
+    public boolean VerifySignature(String publicKey, String message, String signature) throws WalletException {
+        return VerifySignature(mInstance, publicKey, message, signature);
+    }
+
+    public String GetPublicKeyDID(String publicKey) throws WalletException {
+        return GetPublicKeyDID(mInstance, publicKey);
+    }
+
+    public String GetResolveDIDInfo(int start, int count, String did) throws WalletException {
+        return GetResolveDIDInfo(mInstance, start, count, did);
+    }
+
+    public String SignDigest(String did, String digest, String payPassword) throws WalletException {
+        return SignDigest(mInstance, did, digest, payPassword);
+    }
+
+    public IDChainSubWallet(long instance) {
+        super(instance);
+        mInstance = instance;
+    }
+
+    private native String CreateIDTransaction(long instance, String payloadJSON, String memo);
+
+    private native String GenerateDIDInfoPayload(long instance, String inputJson, String passwd);
+
+    private native String GetAllDID(long instance, int start, int count);
+
+    private native String Sign(long instance, String did, String message, String payPassword);
+
+    private native boolean VerifySignature(long instance, String publicKey, String message, String signature);
+
+    private native String GetPublicKeyDID(long instance, String publicKey);
+
+    private native String GetResolveDIDInfo(long instance, int start, int count, String did);
+
+    private native String SignDigest(long instance, String did, String digest, String payPassword);
 }

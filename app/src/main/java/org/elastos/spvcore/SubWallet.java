@@ -1,191 +1,197 @@
+// Copyright (c) 2012-2019 The Elastos Open Source Project
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 package org.elastos.spvcore;
 
+import android.util.Log;
+
 /**
- * ISubWallet
+ * SubWallet
  */
-public class ISubWallet {
-    private long mSubProxy;
+public class SubWallet {
+    private long mInstance;
+    private ISubWalletCallback mCallback = null;
+    private String TAG = "SubWallet";
 
-	/**
-	 * Get the sub wallet chain id.
-	 * @return sub wallet chain id.
-	 */
     public String GetChainID() throws WalletException {
-        return nativeGetChainID(mSubProxy);
+        return GetChainID(mInstance);
     }
 
-	/**
-	 * Here is a example of hd account wallet basic info:
-	 * {
-	 * 	"Type": "Normal" //Type can be Normal, Mainchain, Sidechain and Idchain
-	 * 	"Account":
-	 * 		{
-	 * 			"Type": "HD Account"
-	 * 			"Details":
-	 * 				{
-	 * 					"CoinIndex": 1
-	 * 				}
-	 * 		}
-	 * }
-	 *
-	 * and an example of multi-sign account wallet basic info:
-	 * {
-	 * 	"Type": "Mainchain" //Type can be Normal, Mainchain, Sidechain and Idchain
-	 * 	"Account":
-	 * 		{
-	 * 			"Type": "Multi-Sign Account"
-	 * 		}
-	 * }
-	 * @return basic information of current master wallet.
-	 */
-	public String GetBasicInfo() throws WalletException {
-		return nativeGetBasicInfo(mSubProxy);
-	}
+    public String GetBasicInfo() throws WalletException {
+        return GetBasicInfo(mInstance);
+    }
 
-	/**
-	 * Get balances of all addresses in json format.
-	 * @return balances of all addresses in json format.
-	 */
     public String GetBalanceInfo() throws WalletException {
-        return nativeGetBalanceInfo(mSubProxy);
+        return GetBalanceInfo(mInstance);
     }
 
-    public String GetBalance(int balanceType) throws WalletException {
-        return nativeGetBalance(mSubProxy, balanceType);
+    public String GetBalance() throws WalletException {
+        Log.d(TAG, "SubWallet [" + mInstance + "] get balance");
+        return GetBalance(mInstance);
     }
 
-	/**
-	 * Create a new address or return existing unused address. Note that if create the sub wallet by setting the singleAddress to true, will always return the single address.
-	 * @return a new address or existing unused address.
-	 */
     public String CreateAddress() throws WalletException {
-        return nativeCreateAddress(mSubProxy);
+        return CreateAddress(mInstance);
     }
 
-	/**
-	 * Get all created addresses in json format. The parameters of start and count are used for purpose of paging.
-	 * @param start specify start index of all addresses list.
-	 * @param count specify count of addresses we need.
-	 * @return addresses in json format.
-	 */
     public String GetAllAddress(int start, int count) throws WalletException {
-        return nativeGetAllAddress(mSubProxy, start, count);
+        return GetAllAddress(mInstance, start, count);
     }
 
-    public String GetBalanceWithAddress(String address, int balanceType) throws WalletException {
-        return nativeGetBalanceWithAddress(mSubProxy, address, balanceType);
+    public String GetAllPublicKeys(int start, int count) throws WalletException {
+        return GetAllPublicKeys(mInstance, start, count);
     }
 
-	/**
-	 * Add a sub wallet callback object listened to current sub wallet.
-	 * @param subCallback is a callback who want to listen events of current sub wallet.
-	 */
+    public String GetBalanceWithAddress(String address) throws WalletException {
+        return GetBalanceWithAddress(mInstance, address);
+    }
+
+    public boolean IsCallbackRegistered() {
+        return mCallback != null;
+    }
+
+    public ISubWalletCallback getCallback() {
+        return mCallback;
+    }
+
     public void AddCallback(ISubWalletCallback subCallback) throws WalletException {
-        nativeAddCallback(mSubProxy, subCallback);
+        if (mCallback == null) {
+            Log.d(TAG, "SubWallet[" + mInstance + "] adding callback");
+            AddCallback(mInstance, subCallback);
+            mCallback = subCallback;
+        } else {
+            Log.w(TAG, "SubWallet[" + GetChainID() + "]'s callback already registered");
+        }
     }
 
-	/**
-	 * Remove a sub wallet callback object listened to current sub wallet.
-	 */
     public void RemoveCallback() throws WalletException {
-        nativeRemoveCallback(mSubProxy);
+        if (mCallback != null) {
+            Log.d(TAG, "SubWallet[" + mInstance + "] removing callback");
+            RemoveCallback(mInstance);
+//            mCallback.Dispose();
+            mCallback = null;
+        } else {
+            Log.w(TAG, "SubWallet[" + GetChainID() + "]'s callback already remove");
+        }
     }
 
-    public String CreateTransaction(String fromAddress, String toAddress, String amount, String memo, boolean useVotedUTXO) throws WalletException {
-        return nativeCreateTransaction(mSubProxy, fromAddress, toAddress, amount, memo, useVotedUTXO);
+    public String CreateTransaction(String fromAddress, String toAddress, String amount, String memo) throws WalletException {
+        return CreateTransaction(mInstance, fromAddress, toAddress, amount, memo);
     }
 
-	/**
-	 * Sign a transaction or append sign to a multi-sign transaction and return the content of transaction in json format.
-	 * @param rawTransaction content of transaction in json format.
-	 * @param payPassword use to decrypt the root private key temporarily. Pay password should between 8 and 128, otherwise will throw invalid argument exception.
-	 * @return If success return the content of transaction in json format.
-	 */
-	public String SignTransaction(String rawTransaction, String payPassword) throws WalletException {
-		return nativeSignTransaction(mSubProxy, rawTransaction, payPassword);
-	}
+    public String GetAllUTXOs(int start, int count, String address) {
+        return GetAllUTXOs(mInstance, start, count, address);
+    }
 
-	/**
-	 * Get signers already signed specified transaction.
-	 * @param rawTransaction a multi-sign transaction to find signed signers.
-	 * @return Signed signers in json format. An example of result will be displayed as follows:
-	 * {
-	 * 	[
-	 * 		"03b73a64f50c142c1f08710e04b928553508c3028e045dfdfdc5489434df13275e",
-	 * 		"02f925e82f4482a9aa853a35203ab8965439c9db6aee8ef1783d2e1a491c28a482"
-	 * 	]
-	 * }
-	 */
-	public String GetTransactionSignedInfo(String rawTransaction) throws WalletException {
-		return nativeGetTransactionSignedInfo(mSubProxy, rawTransaction);
-	}
+    public String CreateConsolidateTransaction(String memo) throws WalletException {
+        return CreateConsolidateTransaction(mInstance, memo);
+    }
 
-	/**
-	 * Send a transaction by p2p network.
-	 * @param rawTransaction content of transaction in json format.
-	 * @return Sent result in json format.
-	 */
-	public String PublishTransaction(String rawTransaction) throws WalletException {
-		return nativePublishTransaction(mSubProxy, rawTransaction);
-	}
+    public String SignTransaction(String rawTransaction, String payPassword) throws WalletException {
+        return SignTransaction(mInstance, rawTransaction, payPassword);
+    }
 
-	/**
-	 * Get all qualified transactions sorted by descent (newest first).
-	 * @param start specify start index of all transactions list.
-	 * @param count specify count of transactions we need.
-	 * @param addressOrTxId filter word which can be an address or a transaction id, if empty all transactions shall be qualified.
-	 * @return All qualified transactions in json format.
-	 */
+    public String GetTransactionSignedInfo(String rawTransaction) throws WalletException {
+        return GetTransactionSignedInfo(mInstance, rawTransaction);
+    }
+
+    public String PublishTransaction(String rawTransaction) throws WalletException {
+        return PublishTransaction(mInstance, rawTransaction);
+    }
+
     public String GetAllTransaction(int start, int count, String addressOrTxId) throws WalletException {
-        return nativeGetAllTransaction(mSubProxy, start, count, addressOrTxId);
+        return GetAllTransaction(mInstance, start, count, addressOrTxId);
     }
 
-	/**
-	 * Sign message through root private key of the master wallet.
-	 * @param message need to signed, it should not be empty.
-	 * @param payPassword use to decrypt the root private key temporarily. Pay password should between 8 and 128, otherwise will throw invalid argument exception.
-	 * @return signed data of the message.
-	 */
     public String Sign(String message, String payPassword) throws WalletException {
-        return nativeSign(mSubProxy, message, payPassword);
+        return Sign(mInstance, message, payPassword);
     }
 
     public boolean CheckSign(String publicKey, String message, String signature) throws WalletException {
-        return nativeCheckSign(mSubProxy, publicKey, message, signature);
+        return CheckSign(mInstance, publicKey, message, signature);
     }
 
-	/**
-	 * Get root public key of current sub wallet.
-	 * @return root public key with hex string format.
-	 */
-	public String GetPublicKey() throws WalletException {
-		return nativeGetPublicKey(mSubProxy);
-	}
-
-    public ISubWallet(long proxy) {
-        mSubProxy = proxy;
+    public String GetOwnerPublicKeyRing() throws WalletException {
+        return GetOwnerPublicKeyRing(mInstance);
     }
 
-    protected long getProxy() {
-        return mSubProxy;
+    public String GetAllCoinBaseTransaction(int start, int count, String txid) throws WalletException {
+        return GetAllCoinBaseTransaction(mInstance, start, count, txid);
     }
 
-    private native String nativeGetChainID(long subProxy);
-    private native String nativeGetBasicInfo(long subProxy);
-    private native String nativeGetBalanceInfo(long subProxy);
-    private native String nativeGetBalance(long subProxy, int balanceType);
-    private native String nativeCreateAddress(long subProxy);
-    private native String nativeGetAllAddress(long subProxy, int start, int count);
-    private native String nativeGetBalanceWithAddress(long subProxy, String address, int balanceType);
-    private native void nativeAddCallback(long subProxy, ISubWalletCallback subCallback);
-    private native void nativeRemoveCallback(long subProxy);
-    private native String nativeCreateTransaction(long subProxy, String fromAddress, String toAddress, String amount, String memo, boolean useVotedUTXO);
-	private native String nativeSignTransaction(long subProxy, String rawTransaction, String payPassword);
-	private native String nativeGetTransactionSignedInfo(long subProxy, String rawTransaction);
-	private native String nativePublishTransaction(long subProxy, String rawTransaction);
-    private native String nativeGetAllTransaction(long subProxy, int start, int count, String addressOrTxId);
-    private native String nativeSign(long subProxy, String message, String payPassword);
-    private native boolean nativeCheckSign(long subProxy, String publicKey, String message, String signature);
-	private native String nativeGetPublicKey(long jSubProxy);
+    public String GetAssetInfo(String assetID) throws WalletException {
+        return GetAssetInfo(mInstance, assetID);
+    }
+
+    public boolean SetFixedPeer(String address, int port) throws WalletException {
+        return SetFixedPeer(mInstance, address, port);
+    }
+
+    public void SyncStart() throws WalletException {
+        SyncStart(mInstance);
+    }
+
+    public void SyncStop() throws WalletException {
+        SyncStop(mInstance);
+    }
+
+
+    public SubWallet(long instance) {
+        mInstance = instance;
+    }
+
+    protected long GetProxy() {
+        return mInstance;
+    }
+
+    private native String GetChainID(long subProxy);
+
+    private native String GetBasicInfo(long subProxy);
+
+    private native String GetBalanceInfo(long subProxy);
+
+    private native String GetBalance(long subProxy);
+
+    private native String CreateAddress(long subProxy);
+
+    private native String GetAllAddress(long subProxy, int start, int count);
+
+    private native String GetAllPublicKeys(long subProxy, int start, int count);
+
+    private native String GetBalanceWithAddress(long subProxy, String address);
+
+    private native void AddCallback(long subProxy, ISubWalletCallback subCallback);
+
+    private native void RemoveCallback(long subProxys);
+
+    private native String CreateTransaction(long subProxy, String fromAddress, String toAddress, String amount, String memo);
+
+    private native String GetAllUTXOs(long subProxy, int start, int count, String address);
+
+    private native String CreateConsolidateTransaction(long subProxy, String memo);
+
+    private native String SignTransaction(long subProxy, String rawTransaction, String payPassword);
+
+    private native String GetTransactionSignedInfo(long subProxy, String rawTransaction);
+
+    private native String PublishTransaction(long subProxy, String rawTransaction);
+
+    private native String GetAllTransaction(long subProxy, int start, int count, String addressOrTxId);
+
+    private native String Sign(long subProxy, String message, String payPassword);
+
+    private native boolean CheckSign(long subProxy, String publicKey, String message, String signature);
+
+    private native String GetOwnerPublicKeyRing(long subProxy);
+
+    private native String GetAllCoinBaseTransaction(long subProxy, int start, int count, String txid);
+
+    private native String GetAssetInfo(long subProxy, String assetID);
+
+    private native boolean SetFixedPeer(long subProxy, String address, int port);
+
+    private native void SyncStart(long proxy);
+
+    private native void SyncStop(long proxy);
 }
