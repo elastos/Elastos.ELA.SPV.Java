@@ -156,8 +156,7 @@ static jstring JNICALL GetBalanceWithAddress(JNIEnv *env, jobject clazz, jlong j
     return result;
 }
 
-// #define JNI_AddCallback "(JJ)V"
-#define JNI_AddCallback "(JLorg/elastos/spvcore/ISubWalletCallback;)V"
+#define JNI_AddCallback "(JJ)V"
 
 static void JNICALL AddCallback(JNIEnv *env, jobject clazz, jlong jSubProxy,
                                 jlong jSubWalletCallbackInstance) {

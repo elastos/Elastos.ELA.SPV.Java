@@ -11,7 +11,7 @@ import android.util.Log;
  */
 public class SubWallet {
     private long mInstance;
-    private ISubWalletCallback mCallback = null;
+    private SubWalletCallback mCallback = null;
     private String TAG = "SubWallet";
 
     public String GetChainID() throws WalletException {
@@ -51,14 +51,14 @@ public class SubWallet {
         return mCallback != null;
     }
 
-    public ISubWalletCallback getCallback() {
+    public SubWalletCallback getCallback() {
         return mCallback;
     }
 
-    public void AddCallback(ISubWalletCallback subCallback) throws WalletException {
+    public void AddCallback(SubWalletCallback subCallback) throws WalletException {
         if (mCallback == null) {
             Log.d(TAG, "SubWallet[" + mInstance + "] adding callback");
-            AddCallback(mInstance, subCallback);
+            AddCallback(mInstance, subCallback.GetProxy());
             mCallback = subCallback;
         } else {
             Log.w(TAG, "SubWallet[" + GetChainID() + "]'s callback already registered");
@@ -69,7 +69,7 @@ public class SubWallet {
         if (mCallback != null) {
             Log.d(TAG, "SubWallet[" + mInstance + "] removing callback");
             RemoveCallback(mInstance);
-//            mCallback.Dispose();
+            mCallback.Dispose();
             mCallback = null;
         } else {
             Log.w(TAG, "SubWallet[" + GetChainID() + "]'s callback already remove");
@@ -161,7 +161,7 @@ public class SubWallet {
 
     private native String GetBalanceWithAddress(long subProxy, String address);
 
-    private native void AddCallback(long subProxy, ISubWalletCallback subCallback);
+    private native void AddCallback(long subProxy, long subCallback);
 
     private native void RemoveCallback(long subProxys);
 
