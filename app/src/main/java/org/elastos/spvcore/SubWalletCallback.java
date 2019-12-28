@@ -60,6 +60,7 @@ public class SubWalletCallback {
             jsonObject.put("confirms", confirms);
             jsonObject.put("MasterWalletID", mMasterWalletID);
             jsonObject.put("ChainID", mSubWalletID);
+            jsonObject.put("Action", "OnTransactionStatusChanged");
 
             mListener.sendResultSuccess(jsonObject);
         } catch (JSONException e) {
@@ -79,10 +80,12 @@ public class SubWalletCallback {
      * }
      */
     public void OnBlockSyncProgress(String progressInfo) {
+//        Log.i(TAG, GetWalletID() + "[OnBlockSyncProgress] " + progressInfo);
         try {
             JSONObject jProgressInfo = new JSONObject(progressInfo);
             jProgressInfo.put("MasterWalletID", mMasterWalletID);
             jProgressInfo.put("ChainID", mSubWalletID);
+            jProgressInfo.put("Action", "OnBlockSyncProgress");
 
             mListener.sendResultSuccess(jProgressInfo);
         } catch (JSONException e) {
@@ -92,13 +95,14 @@ public class SubWalletCallback {
     }
 
     public void OnBalanceChanged(String assetID, String balance) {
-//        Log.i(TAG, GetWalletID() + "[OnBalanceChanged] " + assetID + " = " + balance);
+//       Log.i(TAG, GetWalletID() + "[OnBalanceChanged] " + assetID + " = " + balance);
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("Asset", assetID);
             jsonObject.put("Balance", balance);
             jsonObject.put("MasterWalletID", mMasterWalletID);
             jsonObject.put("ChainID", mSubWalletID);
+            jsonObject.put("Action", "OnBalanceChanged");
 
             mListener.sendResultSuccess(jsonObject);
         } catch (JSONException e) {
@@ -108,13 +112,14 @@ public class SubWalletCallback {
     }
 
     public void OnTxPublished(String hash, String result) {
-//        Log.i(TAG, GetWalletID() + "[OnTxPublished] " + hash + ", result: " + result);
+//       Log.i(TAG, GetWalletID() + "[OnTxPublished] " + hash + ", result: " + result);
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("hash", hash);
             jsonObject.put("result", result);
             jsonObject.put("MasterWalletID", mMasterWalletID);
             jsonObject.put("ChainID", mSubWalletID);
+            jsonObject.put("Action", "OnTxPublished");
 
             mListener.sendResultSuccess(jsonObject);
         } catch (JSONException e) {
@@ -131,6 +136,7 @@ public class SubWalletCallback {
             jsonObject.put("info", info);
             jsonObject.put("MasterWalletID", mMasterWalletID);
             jsonObject.put("ChainID", mSubWalletID);
+            jsonObject.put("Action", "OnAssetRegistered");
             mListener.sendResultSuccess(jsonObject);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -147,6 +153,7 @@ public class SubWalletCallback {
             jsonObject.put("status", status);
             jsonObject.put("MasterWalletID", mMasterWalletID);
             jsonObject.put("ChainID", mSubWalletID);
+            jsonObject.put("Action", "OnConnectStatusChanged");
             mListener.sendResultSuccess(jsonObject);
         } catch (JSONException e) {
             e.printStackTrace();
