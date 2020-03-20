@@ -707,6 +707,35 @@ GetRegisteredCRInfo(JNIEnv *env, jobject clazz, jlong jSubWalletProxy) {
     return info;
 }
 
+#define JNI_GetVoteInfo "(JLjava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL
+GetVoteInfo(JNIEnv *env, jobject clazz, jlong jSubWalletProxy, jstring jtype) {
+    bool exception = false;
+    jstring info = NULL;
+    std::string msgException;
+
+    const char *type = env->GetStringUTFChars(jtype, NULL);
+
+    IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+
+    try {
+        nlohmann::json infoJson = subWallet->GetVoteInfo(type);
+        info = env->NewStringUTF(infoJson.dump().c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jtype, type);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return info;
+}
+
 #define JNI_SponsorProposalDigest "(JBLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
 
 static jstring JNICALL SponsorProposalDigest(JNIEnv *env, jobject clazz, jlong jSubWalletProxy,
@@ -1134,6 +1163,7 @@ static const JNINativeMethod methods[] = {
         REGISTER_METHOD(CreateRetrieveCRDepositTransaction),
         REGISTER_METHOD(CreateVoteCRTransaction),
         REGISTER_METHOD(GetVotedCRList),
+        REGISTER_METHOD(GetVoteInfo),
         REGISTER_METHOD(GetRegisteredCRInfo),
         REGISTER_METHOD(SponsorProposalDigest),
         REGISTER_METHOD(CRSponsorProposalDigest),

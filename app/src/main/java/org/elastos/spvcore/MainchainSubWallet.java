@@ -100,6 +100,10 @@ public class MainchainSubWallet extends SubWallet {
         return GetRegisteredCRInfo(mMainchainProxy);
     }
 
+    public String GetVoteInfo(String type) throws WalletException {
+        return GetVoteInfo(mMainchainProxy, type);
+    }
+
     public String SponsorProposalDigest(byte type, String sponsorPublicKey, String draftHash, String budgets, String recipient) throws WalletException {
         return SponsorProposalDigest(mMainchainProxy, type, sponsorPublicKey, draftHash, budgets, recipient);
     }
@@ -188,6 +192,8 @@ public class MainchainSubWallet extends SubWallet {
     private native String GetVotedCRList(long Proxy);
 
     private native String GetRegisteredCRInfo(long Proxy);
+
+    private native String GetVoteInfo(long Proxy, String type);
 
     private native String SponsorProposalDigest(long Proxy, byte type, String sponsorPublicKey, String draftHash, String budgets, String recipient);
 
