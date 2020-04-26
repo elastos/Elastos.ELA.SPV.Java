@@ -63,13 +63,13 @@ public class MainchainSubWallet extends SubWallet {
         return GetOwnerAddress(mMainchainProxy);
     }
 
-    public String GenerateCRInfoPayload(String crPublickey, String nickName, String url,
+    public String GenerateCRInfoPayload(String crPublickey, String did, String nickName, String url,
                                         long location) throws WalletException {
-        return GenerateCRInfoPayload(mMainchainProxy, crPublickey, nickName, url, location);
+        return GenerateCRInfoPayload(mMainchainProxy, crPublickey, did, nickName, url, location);
     }
 
-    public String GenerateUnregisterCRPayload(String crDID) throws WalletException {
-        return GenerateUnregisterCRPayload(mMainchainProxy, crDID);
+    public String GenerateUnregisterCRPayload(String cID) throws WalletException {
+        return GenerateUnregisterCRPayload(mMainchainProxy, cID);
     }
 
     public String CreateRegisterCRTransaction(String fromAddress, String payload, String amount, String memo) throws WalletException {
@@ -96,24 +96,24 @@ public class MainchainSubWallet extends SubWallet {
         return GetVotedCRList(mMainchainProxy);
     }
 
-    public String GetRegisteredCRInfo() throws WalletException {
-        return GetRegisteredCRInfo(mMainchainProxy);
-    }
-
     public String GetVoteInfo(String type) throws WalletException {
         return GetVoteInfo(mMainchainProxy, type);
     }
 
-    public String SponsorProposalDigest(byte type, String sponsorPublicKey, String draftHash, String budgets, String recipient) throws WalletException {
-        return SponsorProposalDigest(mMainchainProxy, type, sponsorPublicKey, draftHash, budgets, recipient);
+    public String GetRegisteredCRInfo() throws WalletException {
+        return GetRegisteredCRInfo(mMainchainProxy);
     }
 
-    public String CRSponsorProposalDigest(String sponsorSignedProposal, String crSponsorDID) throws WalletException {
-        return CRSponsorProposalDigest(mMainchainProxy, sponsorSignedProposal, crSponsorDID);
+    public String ProposalOwnerDigest(String payload) throws WalletException {
+        return ProposalOwnerDigest(mMainchainProxy, payload);
     }
 
-    public String CreateCRCProposalTransaction(String crSignedProposal, String memo) throws WalletException {
-        return CreateCRCProposalTransaction(mMainchainProxy, crSignedProposal, memo);
+    public String ProposalCRCouncilMemberDigest(String payload) throws WalletException {
+        return ProposalCRCouncilMemberDigest(mMainchainProxy, payload);
+    }
+
+    public String CreateProposalTransaction(String payload, String memo) throws WalletException {
+        return CreateProposalTransaction(mMainchainProxy, payload, memo);
     }
 
     public String CreateVoteCRCProposalTransaction(String fromAddress, String votes, String memo, String invalidCandidates) throws WalletException {
@@ -124,28 +124,36 @@ public class MainchainSubWallet extends SubWallet {
         return CreateImpeachmentCRCTransaction(mMainchainProxy, fromAddress, votes, memo, invalidCandidates);
     }
 
-    public String GenerateCRCProposalReview(String proposalHash, byte voteResult, String crDID, String payPasswd) throws WalletException {
-        return GenerateCRCProposalReview(mMainchainProxy, proposalHash, voteResult, crDID, payPasswd);
+    public String ProposalReviewDigest(String payload) throws WalletException {
+        return ProposalReviewDigest(mMainchainProxy, payload);
     }
 
-    public String CreateCRCProposalReviewTransaction(String proposalHash, String proposalReview, String memo) throws WalletException {
-        return CreateCRCProposalReviewTransaction(mMainchainProxy, proposalReview, memo);
+    public String CreateProposalReviewTransaction(String payload, String memo) throws WalletException {
+        return CreateProposalReviewTransaction(mMainchainProxy, payload, memo);
     }
 
-    public String LeaderProposalTrackDigest(byte type, String proposalHash, String documentHash, byte stage, String appropriation, String leaderPubKey, String newLeaderPubKey) {
-        return LeaderProposalTrackDigest(mMainchainProxy, type, proposalHash, documentHash, stage, appropriation, leaderPubKey, newLeaderPubKey);
+    public String ProposalTrackingOwnerDigest(String payload) {
+        return ProposalTrackingOwnerDigest(mMainchainProxy, payload);
     }
 
-    public String NewLeaderProposalTrackDigest(String leaderSignedProposalTracking) {
-        return NewLeaderProposalTrackDigest(leaderSignedProposalTracking);
+    public String ProposalTrackingNewOwnerDigest(String payload) {
+        return ProposalTrackingNewOwnerDigest(payload);
     }
 
-    public String SecretaryGeneralProposalTrackDigest(String leaderSignedProposalTracking) {
-        return SecretaryGeneralProposalTrackDigest(leaderSignedProposalTracking);
+    public String ProposalTrackingSecretaryDigest(String payload) {
+        return ProposalTrackingSecretaryDigest(payload);
     }
 
-    public String CreateProposalTrackingTransaction(String SecretaryGeneralSignedPayload, String memo) {
-        return CreateProposalTrackingTransaction(mMainchainProxy, SecretaryGeneralSignedPayload, memo);
+    public String CreateProposalTrackingTransaction(String payload, String memo) {
+        return CreateProposalTrackingTransaction(mMainchainProxy, payload, memo);
+    }
+
+    public String ProposalWithdrawDigest(String payload) {
+        return ProposalWithdrawDigest(mMainchainProxy, payload);
+    }
+
+    public String CreateProposalWithdrawTransaction(String recipient, String amount, String utxo, String payload, String memo) {
+        return CreateProposalWithdrawTransaction(mMainchainProxy, recipient, amount, utxo, payload, memo);
     }
 
     private native String CreateDepositTransaction(long proxy, String fromAddress, String sideChainID, String amount,
@@ -175,9 +183,9 @@ public class MainchainSubWallet extends SubWallet {
 
     private native String GetOwnerAddress(long proxy);
 
-    private native String GenerateCRInfoPayload(long proxy, String crPublickey, String nickName, String url, long location);
+    private native String GenerateCRInfoPayload(long proxy, String crPublickey, String did, String nickName, String url, long location);
 
-    private native String GenerateUnregisterCRPayload(long proxy, String crDID);
+    private native String GenerateUnregisterCRPayload(long proxy, String cID);
 
     private native String CreateRegisterCRTransaction(long proxy, String fromAddress, String payload, String amount, String memo);
 
@@ -191,30 +199,34 @@ public class MainchainSubWallet extends SubWallet {
 
     private native String GetVotedCRList(long Proxy);
 
-    private native String GetRegisteredCRInfo(long Proxy);
-
     private native String GetVoteInfo(long Proxy, String type);
 
-    private native String SponsorProposalDigest(long Proxy, byte type, String sponsorPublicKey, String draftHash, String budgets, String recipient);
+    private native String GetRegisteredCRInfo(long Proxy);
 
-    private native String CRSponsorProposalDigest(long Proxy, String sponsorSignedProposal, String crSponsorDID);
+    private native String ProposalOwnerDigest(long Proxy, String payload);
 
-    private native String CreateCRCProposalTransaction(long Proxy, String crSignedProposal, String memo);
+    private native String ProposalCRCouncilMemberDigest(long Proxy, String payload);
+
+    private native String CreateProposalTransaction(long Proxy, String payload, String memo);
 
     private native String CreateVoteCRCProposalTransaction(long Proxy, String fromAddress, String votes, String memo, String invalidCandidates);
 
     private native String CreateImpeachmentCRCTransaction(long Proxy, String fromAddress, String votes, String memo, String invalidCandidates);
 
-    private native String GenerateCRCProposalReview(long Proxy, String proposalHash, byte voteResult, String crDID, String payPasswd);
+    private native String ProposalReviewDigest(long Proxy, String payload);
 
-    private native String CreateCRCProposalReviewTransaction(long Proxy, String proposalReview, String memo);
+    private native String CreateProposalReviewTransaction(long Proxy, String payload, String memo);
 
-    private native String LeaderProposalTrackDigest(long Proxy, byte type, String proposalHash, String documentHash, byte stage, String appropriation, String leaderPubKey, String newLeaderPubKey);
+    private native String ProposalTrackingOwnerDigest(long Proxy, String payload);
 
-    private native String NewLeaderProposalTrackDigest(long Proxy, String leaderSignedProposalTracking);
+    private native String ProposalTrackingNewOwnerDigest(long Proxy, String payload);
 
-    private native String SecretaryGeneralProposalTrackDigest(long Proxy, String leaderSignedProposalTracking);
+    private native String ProposalTrackingSecretaryDigest(long Proxy, String payload);
 
-    private native String CreateProposalTrackingTransaction(long Proxy, String SecretaryGeneralSignedPayload, String memo);
+    private native String CreateProposalTrackingTransaction(long Proxy, String payload, String memo);
+
+    private native String ProposalWithdrawDigest(long Proxy, String payload);
+
+    private native String CreateProposalWithdrawTransaction(long Proxy, String recipient, String amount, String utxo, String payload, String memo);
 
 }
