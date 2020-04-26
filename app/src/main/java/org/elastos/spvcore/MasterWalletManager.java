@@ -20,9 +20,11 @@ public class MasterWalletManager {
 	}
 
     private boolean MasterWalletExist(String walletID) {
-        for (int i = 0; i < mMasterWallets.size(); ++i) {
-            if (mMasterWallets.get(i).equals(walletID))
+        String[] allID = GetAllMasterWalletID();
+        for (int i = 0; i < allID.length; ++i) {
+            if (allID[i].equals(walletID)) {
                 return true;
+            }
         }
 
         return false;
@@ -31,11 +33,6 @@ public class MasterWalletManager {
     public MasterWalletManager(String rootPath, String netType, String config, String dataPath) throws WalletException {
         mRootPath = rootPath;
         mInstance = InitMasterWalletManager(mRootPath, netType, config, dataPath);
-
-        long[] masterWalletProxies = GetAllMasterWallets(mInstance);
-        for (int i = 0; i < masterWalletProxies.length; i++) {
-            mMasterWallets.add(new MasterWallet(masterWalletProxies[i]));
-        }
     }
 
     public void Dispose() {
@@ -66,6 +63,10 @@ public class MasterWalletManager {
         return masterWallet;
     }
 
+    public ArrayList<MasterWallet> GetLoadedMasterWallets() throws WalletException {
+        return mMasterWallets;
+    }
+
     public ArrayList<MasterWallet> GetAllMasterWallets() throws WalletException {
 
         long[] masterWalletProxies = GetAllMasterWallets(mInstance);
@@ -74,8 +75,10 @@ public class MasterWalletManager {
             MasterWallet masterWallet = new MasterWallet(masterWalletProxies[i]);
             boolean found = false;
             for (int j = 0; j < mMasterWallets.size(); ++j) {
-                if (mMasterWallets.get(j).GetID().equals(masterWallet.GetID()))
+                if (mMasterWallets.get(j).GetID().equals(masterWallet.GetID())) {
                     found = true;
+                    break;
+                }
             }
 
             if (!found)
@@ -89,15 +92,22 @@ public class MasterWalletManager {
         return GetAllMasterWalletID(mInstance);
     }
 
-    public MasterWallet GetWallet(String masterWalletId) throws WalletException {
+    public MasterWallet GetMasterWallet(String masterWalletId) throws WalletException {
         for (int i = 0; i < mMasterWallets.size(); ++i) {
             if (mMasterWallets.get(i).GetID().equals(masterWalletId))
                 return mMasterWallets.get(i);
         }
 
-        Log.e(TAG, "master wallet [" + masterWalletId + "] not found");
+        long instance = GetMasterWallet(mInstance, masterWalletId);
+        if (instance == 0) {
+            Log.e(TAG, "master wallet [" + masterWalletId + "] not found");
+            return null;
+        }
 
-        return null;
+        MasterWallet masterWallet = new MasterWallet(instance);
+        mMasterWallets.add(masterWallet);
+
+        return masterWallet;
     }
 
     public void DestroyWallet(String masterWalletId) throws WalletException {

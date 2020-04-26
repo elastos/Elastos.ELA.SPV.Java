@@ -161,7 +161,6 @@ public class SubWalletCallback {
         }
     }
 
-
     private native long InitSubWalletCallback();
 
     private native void DisposeNative(long proxy);
