@@ -55,6 +55,10 @@ public class MainchainSubWallet extends SubWallet {
         return GetVotedProducerList(mMainchainProxy);
     }
 
+    public String GetVoteInfo(String type) throws WalletException {
+        return GetVoteInfo(mMainchainProxy, type);
+    }
+
     public String GetRegisteredProducerInfo() throws WalletException {
         return GetRegisteredProducerInfo(mMainchainProxy);
     }
@@ -96,10 +100,6 @@ public class MainchainSubWallet extends SubWallet {
         return GetVotedCRList(mMainchainProxy);
     }
 
-    public String GetVoteInfo(String type) throws WalletException {
-        return GetVoteInfo(mMainchainProxy, type);
-    }
-
     public String GetRegisteredCRInfo() throws WalletException {
         return GetRegisteredCRInfo(mMainchainProxy);
     }
@@ -110,6 +110,10 @@ public class MainchainSubWallet extends SubWallet {
 
     public String ProposalCRCouncilMemberDigest(String payload) throws WalletException {
         return ProposalCRCouncilMemberDigest(mMainchainProxy, payload);
+    }
+
+    public String CalculateProposalHash(String payload) throws WalletException {
+        return CalculateProposalHash(mMainchainProxy, payload);
     }
 
     public String CreateProposalTransaction(String payload, String memo) throws WalletException {
@@ -137,11 +141,11 @@ public class MainchainSubWallet extends SubWallet {
     }
 
     public String ProposalTrackingNewOwnerDigest(String payload) {
-        return ProposalTrackingNewOwnerDigest(payload);
+        return ProposalTrackingNewOwnerDigest(mMainchainProxy, payload);
     }
 
     public String ProposalTrackingSecretaryDigest(String payload) {
-        return ProposalTrackingSecretaryDigest(payload);
+        return ProposalTrackingSecretaryDigest(mMainchainProxy, payload);
     }
 
     public String CreateProposalTrackingTransaction(String payload, String memo) {
@@ -206,6 +210,8 @@ public class MainchainSubWallet extends SubWallet {
     private native String ProposalOwnerDigest(long Proxy, String payload);
 
     private native String ProposalCRCouncilMemberDigest(long Proxy, String payload);
+
+    private native String CalculateProposalHash(long Proxy, String payload);
 
     private native String CreateProposalTransaction(long Proxy, String payload, String memo);
 

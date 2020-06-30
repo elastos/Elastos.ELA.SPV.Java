@@ -360,6 +360,35 @@ static jstring JNICALL GetVotedProducerList(JNIEnv *env, jobject clazz, jlong jS
     return list;
 }
 
+#define JNI_GetVoteInfo "(JLjava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL GetVoteInfo(JNIEnv *env, jobject clazz, jlong jSubWalletProxy,
+        jstring jtype) {
+    bool exception = false;
+    std::string msgException;
+
+    const char *type = env->GetStringUTFChars(jtype, NULL);
+
+    IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+    jstring list = NULL;
+
+    try {
+        nlohmann::json listJson = subWallet->GetVoteInfo(type);
+        list = env->NewStringUTF(listJson.dump().c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jtype, type);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return list;
+}
+
 #define JNI_GetRegisteredProducerInfo "(J)Ljava/lang/String;"
 
 static jstring JNICALL
@@ -715,35 +744,6 @@ GetRegisteredCRInfo(JNIEnv *env, jobject clazz, jlong jSubWalletProxy) {
     return info;
 }
 
-#define JNI_GetVoteInfo "(JLjava/lang/String;)Ljava/lang/String;"
-
-static jstring JNICALL
-GetVoteInfo(JNIEnv *env, jobject clazz, jlong jSubWalletProxy, jstring jtype) {
-    bool exception = false;
-    jstring info = NULL;
-    std::string msgException;
-
-    const char *type = env->GetStringUTFChars(jtype, NULL);
-
-    IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
-
-    try {
-        nlohmann::json infoJson = subWallet->GetVoteInfo(type);
-        info = env->NewStringUTF(infoJson.dump().c_str());
-    } catch (const std::exception &e) {
-        exception = true;
-        msgException = e.what();
-    }
-
-    env->ReleaseStringUTFChars(jtype, type);
-
-    if (exception) {
-        ThrowWalletException(env, msgException.c_str());
-    }
-
-    return info;
-}
-
 #define JNI_ProposalOwnerDigest "(JLjava/lang/String;)Ljava/lang/String;"
 
 static jstring JNICALL ProposalOwnerDigest(JNIEnv *env, jobject clazz, jlong jSubWalletProxy,
@@ -788,6 +788,36 @@ static jstring JNICALL ProposalCRCouncilMemberDigest(JNIEnv *env, jobject clazz,
     try {
         std::string digest = subWallet->ProposalCRCouncilMemberDigest(nlohmann::json::parse(payload));
         result = env->NewStringUTF(digest.c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jpayload, payload);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return result;
+}
+
+#define JNI_CalculateProposalHash "(JLjava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL
+CalculateProposalHash(JNIEnv *env, jobject clazz, jlong jSubWalletProxy,
+                          jstring jpayload) {
+    bool exception = false;
+    std::string msgException;
+    jstring result = NULL;
+
+    const char *payload = env->GetStringUTFChars(jpayload, NULL);
+
+    IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+
+    try {
+        std::string hash = subWallet->CalculateProposalHash(nlohmann::json::parse(payload));
+        result = env->NewStringUTF(hash.c_str());
     } catch (const std::exception &e) {
         exception = true;
         msgException = e.what();
@@ -1209,6 +1239,7 @@ static const JNINativeMethod methods[] = {
         REGISTER_METHOD(GetRegisteredCRInfo),
         REGISTER_METHOD(ProposalOwnerDigest),
         REGISTER_METHOD(ProposalCRCouncilMemberDigest),
+        REGISTER_METHOD(CalculateProposalHash),
         REGISTER_METHOD(CreateProposalTransaction),
         REGISTER_METHOD(CreateVoteCRCProposalTransaction),
         REGISTER_METHOD(CreateImpeachmentCRCTransaction),
