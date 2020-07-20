@@ -13,8 +13,9 @@ import java.util.ArrayList;
  */
 public class MasterWallet {
     static public class CHAINID {
-        public static String MAIN = "ELA";
-        public static String ID = "IDChain";
+        public static final String MAIN = "ELA";
+        public static final String ID   = "IDChain";
+        public static final String ETH  = "ETHSC";
     }
 
     static public String TAG = "IMasterWallet";
@@ -68,7 +69,7 @@ public class MasterWallet {
     }
 
     public SubWallet CreateSubWallet(String chainID) throws WalletException {
-        if ((!CHAINID.MAIN.equals(chainID)) && (!CHAINID.ID.equals(chainID))) {
+        if ((!CHAINID.MAIN.equals(chainID)) && (!CHAINID.ID.equals(chainID)) && (!CHAINID.ETH.equals(chainID))) {
             throw new WalletException("Not support the other sidechain now.");
         }
 
@@ -86,13 +87,27 @@ public class MasterWallet {
 
         SubWallet subWallet = null;
 
-        if (CHAINID.MAIN.equals(chainID)) {
-            subWallet = new MainchainSubWallet(subProxy);
-        } else if (CHAINID.ID.equals(chainID)) {
-            subWallet = new IDChainSubWallet(subProxy);
-        } else {
-            throw new WalletException("Unsupport chainID: " + chainID);
+        switch (chainID){
+            case CHAINID.MAIN:
+                subWallet = new MainchainSubWallet(subProxy);
+                break;
+            case CHAINID.ID:
+                subWallet = new IDChainSubWallet(subProxy);
+                break;
+            case CHAINID.ETH:
+                subWallet = new EthSidechainSubWallet(subProxy);
+                break;
+            default:
+                throw new WalletException("Unsupport chainID: " + chainID);
         }
+
+        // if (CHAINID.MAIN.equals(chainID)) {
+        //     subWallet = new MainchainSubWallet(subProxy);
+        // } else if (CHAINID.ID.equals(chainID)) {
+        //     subWallet = new IDChainSubWallet(subProxy);
+        // } else {
+        //     throw new WalletException("Unsupport chainID: " + chainID);
+        // }
 
         mSubWallets.add(subWallet);
 
