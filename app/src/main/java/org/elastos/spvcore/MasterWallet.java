@@ -101,14 +101,6 @@ public class MasterWallet {
                 throw new WalletException("Unsupport chainID: " + chainID);
         }
 
-        // if (CHAINID.MAIN.equals(chainID)) {
-        //     subWallet = new MainchainSubWallet(subProxy);
-        // } else if (CHAINID.ID.equals(chainID)) {
-        //     subWallet = new IDChainSubWallet(subProxy);
-        // } else {
-        //     throw new WalletException("Unsupport chainID: " + chainID);
-        // }
-
         mSubWallets.add(subWallet);
 
         return subWallet;
