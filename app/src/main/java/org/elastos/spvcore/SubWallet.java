@@ -57,7 +57,7 @@ public class SubWallet {
 
     public void AddCallback(SubWalletCallback subCallback) throws WalletException {
         if (mCallback == null) {
-            Log.d(TAG, "SubWallet[" + mInstance + "] adding callback");
+            Log.d(TAG, "SubWallet[" + GetChainID() + "] adding callback");
             AddCallback(mInstance, subCallback.GetProxy());
             mCallback = subCallback;
         } else {
@@ -136,6 +136,10 @@ public class SubWallet {
         SyncStop(mInstance);
     }
 
+    public void Resync() throws WalletException {
+        Resync(mInstance);
+    }
+
 
     public SubWallet(long instance) {
         mInstance = instance;
@@ -194,4 +198,6 @@ public class SubWallet {
     private native void SyncStart(long proxy);
 
     private native void SyncStop(long proxy);
+
+    private native void Resync(long proxy);
 }

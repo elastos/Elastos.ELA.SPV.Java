@@ -145,15 +145,28 @@ public class SubWalletCallback {
     }
 
     public void OnConnectStatusChanged(String status) {
+      // Log.i(TAG, GetWalletID() + "[OnConnectStatusChanged] status=" + status);
         JSONObject jsonObject = new JSONObject();
-        Log.i(TAG, GetWalletID() + "[OnConnectStatusChanged] status=" + status);
-
-
         try {
             jsonObject.put("status", status);
             jsonObject.put("MasterWalletID", mMasterWalletID);
             jsonObject.put("ChainID", mSubWalletID);
             jsonObject.put("Action", "OnConnectStatusChanged");
+            mListener.sendResultSuccess(jsonObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            mListener.sendResultError(e.toString());
+        }
+    }
+
+    public void OnETHSCEventHandled(String event) {
+        JSONObject jsonObject = new JSONObject();
+
+        try {
+            jsonObject.put("event", event);
+            jsonObject.put("MasterWalletID", mMasterWalletID);
+            jsonObject.put("ChainID", mSubWalletID);
+            jsonObject.put("Action", "OnETHSCEventHandled");
             mListener.sendResultSuccess(jsonObject);
         } catch (JSONException e) {
             e.printStackTrace();

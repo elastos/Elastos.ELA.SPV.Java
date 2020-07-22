@@ -127,7 +127,17 @@ namespace Elastos {
             env->DeleteLocalRef(clazz);
         }
 
+        void SubWalletCallback::OnETHSCEventHandled(const nlohmann::json &event) {
+            JNIEnv *env = GetEnv();
+            jstring jevent = env->NewStringUTF(event.dump().c_str());
 
+            jclass clazz = env->GetObjectClass(_obj);
+            jmethodID methodId = env->GetMethodID(clazz, "OnETHSCEventHandled", "(Ljava/lang/String;)V");
+
+            env->CallVoidMethod(_obj, methodId, jevent);
+            env->DeleteLocalRef(jevent);
+            env->DeleteLocalRef(clazz);
+        }
     }
 }
 
