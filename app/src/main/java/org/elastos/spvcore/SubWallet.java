@@ -35,8 +35,8 @@ public class SubWallet {
         return CreateAddress(mInstance);
     }
 
-    public String GetAllAddress(int start, int count) throws WalletException {
-        return GetAllAddress(mInstance, start, count);
+    public String GetAllAddress(int start, int count, boolean internal) throws WalletException {
+        return GetAllAddress(mInstance, start, count, internal);
     }
 
     public String GetAllPublicKeys(int start, int count) throws WalletException {
@@ -159,7 +159,7 @@ public class SubWallet {
 
     private native String CreateAddress(long subProxy);
 
-    private native String GetAllAddress(long subProxy, int start, int count);
+    private native String GetAllAddress(long subProxy, int start, int count, boolean internal);
 
     private native String GetAllPublicKeys(long subProxy, int start, int count);
 

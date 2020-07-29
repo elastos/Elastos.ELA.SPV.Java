@@ -92,16 +92,17 @@ static jstring JNICALL CreateAddress(JNIEnv *env, jobject clazz, jlong jSubProxy
     return addr;
 }
 
-#define JNI_GetAllAddress "(JII)Ljava/lang/String;"
+#define JNI_GetAllAddress "(JIIZ)Ljava/lang/String;"
 
 static jstring JNICALL GetAllAddress(JNIEnv *env, jobject clazz, jlong jSubProxy,
                                      jint jStart,
-                                     jint jCount) {
+                                     jint jCount,
+                                     jboolean jInternal) {
     jstring addresses = NULL;
 
     try {
         ISubWallet *subWallet = (ISubWallet *) jSubProxy;
-        nlohmann::json addressesJson = subWallet->GetAllAddress(jStart, jCount);
+        nlohmann::json addressesJson = subWallet->GetAllAddress(jStart, jCount, jInternal);
         addresses = env->NewStringUTF(addressesJson.dump().c_str());
     } catch (const std::exception &e) {
         ThrowWalletException(env, e.what());
