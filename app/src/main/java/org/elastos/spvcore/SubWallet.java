@@ -124,6 +124,10 @@ public class SubWallet {
         return GetAssetInfo(mInstance, assetID);
     }
 
+    public String GetLastBlockInfo() throws WalletException {
+        return GetLastBlockInfo(mInstance);
+    }
+
     public boolean SetFixedPeer(String address, int port) throws WalletException {
         return SetFixedPeer(mInstance, address, port);
     }
@@ -192,6 +196,8 @@ public class SubWallet {
     private native String GetAllCoinBaseTransaction(long subProxy, int start, int count, String txid);
 
     private native String GetAssetInfo(long subProxy, String assetID);
+
+    private native String GetLastBlockInfo(long subProxy);
 
     private native boolean SetFixedPeer(long subProxy, String address, int port);
 

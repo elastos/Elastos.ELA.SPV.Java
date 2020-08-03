@@ -512,6 +512,30 @@ static jstring JNICALL GetAssetInfo(JNIEnv *env, jobject clazz, jlong jSubProxy,
     return info;
 }
 
+#define JNI_GetLastBlockInfo "(J)Ljava/lang/String;"
+
+static jstring JNICALL GetLastBlockInfo(JNIEnv *env, jobject clazz, jlong jSubProxy) {
+    bool exception = false;
+    std::string msgException;
+    jstring info = NULL;
+
+    try {
+        ISubWallet *subWallet = (ISubWallet *) jSubProxy;
+        nlohmann::json jsonInfo = subWallet->GetLastBlockInfo();
+        info = env->NewStringUTF(jsonInfo.dump().c_str());
+
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return info;
+}
+
 #define JNI_SetFixedPeer "(JLjava/lang/String;I)Z"
 
 static jbyte JNICALL SetFixedPeer(JNIEnv *env, jobject clazz, jlong jSubProxy,
@@ -560,6 +584,7 @@ static const JNINativeMethod methods[] = {
         REGISTER_METHOD(GetAllTransaction),
         REGISTER_METHOD(GetAllCoinBaseTransaction),
         REGISTER_METHOD(GetAssetInfo),
+        REGISTER_METHOD(GetLastBlockInfo),
         REGISTER_METHOD(SetFixedPeer),
         REGISTER_METHOD(SyncStart),
         REGISTER_METHOD(SyncStop),
