@@ -141,6 +141,10 @@ public class MasterWallet {
         ChangePassword(mInstance, oldPassword, newPassword);
     }
 
+    public void ResetPassword(String mnemonic, String passPhrase, String newPassword) throws WalletException {
+        ResetPassword(mInstance, mnemonic, passPhrase, newPassword);
+    }
+
     public String GetPubKeyInfo() throws WalletException {
         return GetPubKeyInfo(mInstance);
     }
@@ -198,6 +202,8 @@ public class MasterWallet {
     private native String[] GetSupportedChains(long instance);
 
     private native void ChangePassword(long instance, String oldPassword, String newPassword);
+
+    private native void ResetPassword(long instance, String mnemonic, String passphrase, String newPassword);
 
     private native String GetPubKeyInfo(long instance);
 

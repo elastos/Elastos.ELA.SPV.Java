@@ -264,6 +264,36 @@ ChangePassword(JNIEnv *env, jobject clazz, jlong instance, jstring joldPassword,
     }
 }
 
+#define JNI_ResetPassword "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V"
+
+static void JNICALL
+ResetPassword(JNIEnv *env, jobject clazz, jlong instance, jstring jmnemonic,
+                jstring jpassphrase, jstring jnewPassword) {
+    bool exception = false;
+    std::string msgException;
+
+    const char *mnemonic = env->GetStringUTFChars(jmnemonic, NULL);
+    const char *passphrase = env->GetStringUTFChars(jpassphrase, NULL);
+    const char *newPassword = env->GetStringUTFChars(jnewPassword, NULL);
+
+    IMasterWallet *masterWallet = (IMasterWallet *) instance;
+
+    try {
+        masterWallet->ResetPassword(mnemonic, passphrase, newPassword);
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jmnemonic, mnemonic);
+    env->ReleaseStringUTFChars(jpassphrase, passphrase);
+    env->ReleaseStringUTFChars(jnewPassword, newPassword);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+}
+
 #define JNI_VerifyPrivateKey "(JLjava/lang/String;Ljava/lang/String;)Z"
 
 static jboolean JNICALL
@@ -487,6 +517,7 @@ static const JNINativeMethod methods[] = {
         REGISTER_METHOD(IsAddressValid),
         REGISTER_METHOD(GetSupportedChains),
         REGISTER_METHOD(ChangePassword),
+        REGISTER_METHOD(ResetPassword),
         REGISTER_METHOD(GetPubKeyInfo),
         REGISTER_METHOD(VerifyPrivateKey),
         REGISTER_METHOD(VerifyPassPhrase),
