@@ -27,5 +27,6 @@ public class EthSidechainSubWallet extends SubWallet {
 
     private native String CreateTransfer(long instance, String targetAddress, String amount, int amountUnit);
 
-    private native String CreateTransferGeneric(long instance, String targetAddress, String amount, int amountUnit, String gasPrice, int gasPriceUnit, String gasLimit, String data);
+    private native String CreateTransferGeneric(long instance, String targetAddress, String amount, int amountUnit,
+                                                String gasPrice, int gasPriceUnit, String gasLimit, String data);
 }
