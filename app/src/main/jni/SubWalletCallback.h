@@ -46,6 +46,38 @@ namespace Elastos {
 
             virtual void OnETHSCEventHandled(const nlohmann::json &event);
 
+            // ETH sidechain callback: send result to spvsdk
+            virtual nlohmann::json GasPrice(int id);
+
+            virtual nlohmann::json EstimateGas(const std::string &from,
+											   const std::string &to,
+											   const std::string &amount,
+											   const std::string &gasPrice,
+											   const std::string &data,
+											   int id);
+
+            virtual nlohmann::json GetBalance(const std::string &address, int id);
+
+            virtual nlohmann::json SubmitTransaction(const std::string &tx, int id);
+
+            virtual nlohmann::json GetTransactions(const std::string &address,
+												   uint64_t begBlockNumber,
+												   uint64_t endBlockNumber,
+												   int id);
+
+            virtual nlohmann::json GetLogs(const std::string &contract,
+										   const std::string &address,
+										   const std::string &event,
+										   uint64_t begBlockNumber,
+										   uint64_t endBlockNumber,
+										   int id);
+
+            virtual nlohmann::json GetTokens(int id);
+
+            virtual nlohmann::json GetBlockNumber(int id);
+
+            virtual nlohmann::json GetNonce(const std::string &address, int id);
+
             virtual ~SubWalletCallback();
 
         private:

@@ -1,5 +1,6 @@
 package org.elastos.spvcore;
 
+
 public enum EthereumAmountUnit {
     TOKEN_DECIMAL(0),
     TOKEN_INTEGER(1),

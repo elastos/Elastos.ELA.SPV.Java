@@ -13,16 +13,18 @@ public class SubWalletCallback {
     private String mMasterWalletID;
     private String mSubWalletID;
     private ISubWalletListener mListener;
+    private HttRequestETHSC jsonRPC;
     private String TAG = "SubWalletCallback";
 
     public long GetProxy() {
         return mInstance;
     }
 
-    public SubWalletCallback(String masterWalletID, String subWalletID, ISubWalletListener listener) {
+    public SubWalletCallback(String masterWalletID, String subWalletID, String apiUrl, ISubWalletListener listener) {
         mMasterWalletID = masterWalletID;
         mSubWalletID = subWalletID;
         mListener = listener;
+        jsonRPC = new HttRequestETHSC(apiUrl);
         mInstance = InitSubWalletCallback();
     }
 
@@ -163,7 +165,7 @@ public class SubWalletCallback {
         JSONObject jsonObject = new JSONObject();
 
         try {
-            jsonObject.put("event", event);
+            jsonObject.put("event", new JSONObject(event));
             jsonObject.put("MasterWalletID", mMasterWalletID);
             jsonObject.put("ChainID", mSubWalletID);
             jsonObject.put("Action", "OnETHSCEventHandled");
@@ -172,6 +174,53 @@ public class SubWalletCallback {
             e.printStackTrace();
             mListener.sendResultError(e.toString());
         }
+    }
+
+    // ETH sidechain callback: send result to spvsdk, not user
+    public String GasPrice(int id) {
+//        Log.d(TAG, "GasPrice id:" + id);
+        return this.jsonRPC.GetPrice(id);
+    }
+
+    public String EstimateGas(String from, String to, String amount,
+            String gasPrice, String data, int id) {
+//        Log.d(TAG, "EstimateGas");
+        return this.jsonRPC.EstimateGas(from, to, amount, gasPrice, data, id);
+    }
+
+    public String GetBalance(String address, int id) {
+//        Log.d(TAG, "GetBalance address:" + address + " id:" + id);
+        return this.jsonRPC.GetBalance(address, id);
+    }
+
+    public String SubmitTransaction(String tx, int id) {
+//        Log.d(TAG, "SubmitTransaction：" + tx);
+        return this.jsonRPC.SubmitTransaction(tx, id);
+    }
+
+     public String GetTransactions(String address, long begBlockNumber, long endBlockNumber, int id) {
+        Log.d(TAG, "GetTransactions address:" + address + " [" + begBlockNumber + " , " + endBlockNumber + " ] id:" + id);
+        return this.jsonRPC.GetTransactions(address, begBlockNumber, endBlockNumber, id);
+    }
+
+    public String GetLogs(String contract, String address, String event, long begBlockNumber, long endBlockNumber, int id) {
+        Log.d(TAG, "GetLogs id:" + id);
+        return this.jsonRPC.GetLogs(contract, address, event, begBlockNumber, endBlockNumber, id);
+    }
+
+    public String GetTokens(int id) {
+        Log.d(TAG, "GetTokens");
+        return "{}";
+    }
+
+    public String GetBlockNumber(int id) {
+//        Log.d(TAG, "GetBlockNumber id:" + id);
+        return this.jsonRPC.GetBlockNumber(id);
+    }
+
+    public String GetNonce(String address, int id) {
+        Log.d(TAG, "GetNonce address:" + address + " id:" + id);
+        return this.jsonRPC.GetNonce(address, id);
     }
 
     private native long InitSubWalletCallback();

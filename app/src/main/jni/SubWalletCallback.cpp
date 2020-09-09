@@ -10,7 +10,6 @@ namespace Elastos {
         SubWalletCallback::SubWalletCallback(JNIEnv *env, jobject jobj) {
             _obj = env->NewGlobalRef(jobj);
             env->GetJavaVM(&_jvm);
-
         }
 
         SubWalletCallback::~SubWalletCallback() {
@@ -24,6 +23,16 @@ namespace Elastos {
             JNIEnv *env;
             _jvm->AttachCurrentThread(&env, NULL);
             return env;
+        }
+
+        nlohmann::json jstring2json(JNIEnv *env, jstring jresult) {
+            if (jresult == NULL) return NULL;
+
+            const char *charResult = env->GetStringUTFChars(jresult, NULL);
+            nlohmann::json jsonResult = nlohmann::json::parse(charResult);
+
+            env->ReleaseStringUTFChars(jresult, charResult);
+            return jsonResult;
         }
 
         void SubWalletCallback::OnTransactionStatusChanged(const std::string &txid,
@@ -50,7 +59,7 @@ namespace Elastos {
 
         void SubWalletCallback::OnBlockSyncProgress(const nlohmann::json &progressInfo) {
             JNIEnv *env = GetEnv();
-
+//            LOGD("MYTEST", "----OnBlockSyncProgress %s", progressInfo.dump().c_str());
             jstring info = env->NewStringUTF(progressInfo.dump().c_str());
             jclass clazz = env->GetObjectClass(_obj);
             jmethodID methodId = env->GetMethodID(clazz, "OnBlockSyncProgress", "(Ljava/lang/String;)V");
@@ -78,8 +87,7 @@ namespace Elastos {
 //            Detach();
         }
 
-        void
-        SubWalletCallback::OnTxPublished(const std::string &hash, const nlohmann::json &result) {
+        void SubWalletCallback::OnTxPublished(const std::string &hash, const nlohmann::json &result) {
             JNIEnv *env = GetEnv();
 
             jstring jResult = env->NewStringUTF(result.dump().c_str());
@@ -96,8 +104,7 @@ namespace Elastos {
 //            Detach();
         }
 
-        void
-        SubWalletCallback::OnAssetRegistered(const std::string &asset, const nlohmann::json &info) {
+        void SubWalletCallback::OnAssetRegistered(const std::string &asset, const nlohmann::json &info) {
             JNIEnv *env = GetEnv();
 
             jstring jasset = env->NewStringUTF(asset.c_str());
@@ -128,6 +135,7 @@ namespace Elastos {
         }
 
         void SubWalletCallback::OnETHSCEventHandled(const nlohmann::json &event) {
+            LOGD("MYTEST", "----OnETHSCEventHandled %s", event.dump().c_str());
             JNIEnv *env = GetEnv();
             jstring jevent = env->NewStringUTF(event.dump().c_str());
 
@@ -137,6 +145,148 @@ namespace Elastos {
             env->CallVoidMethod(_obj, methodId, jevent);
             env->DeleteLocalRef(jevent);
             env->DeleteLocalRef(clazz);
+        }
+
+        nlohmann::json SubWalletCallback::GasPrice(int id) {
+            JNIEnv *env = GetEnv();
+            jclass clazz = env->GetObjectClass(_obj);
+            jmethodID methodId = env->GetMethodID(clazz, "GasPrice",
+                                                  "(I)Ljava/lang/String;");
+            jstring jresult = (jstring)env->CallObjectMethod(_obj, methodId, id);
+
+            env->DeleteLocalRef(clazz);
+
+            return jstring2json(env, jresult);
+        }
+
+        nlohmann::json SubWalletCallback::EstimateGas(const std::string &from,
+                                                        const std::string &to,
+                                                        const std::string &amount,
+                                                        const std::string &gasPrice,
+                                                        const std::string &data,
+                                                        int id) {
+            JNIEnv *env = GetEnv();
+            jclass clazz = env->GetObjectClass(_obj);
+            jmethodID methodId = env->GetMethodID(clazz, "EstimateGas",
+                                                  "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;JJI)Ljava/lang/String;");
+            jstring jfrom = env->NewStringUTF(from.c_str());
+            jstring jto = env->NewStringUTF(to.c_str());
+            jstring jamount = env->NewStringUTF(amount.c_str());
+            jstring jgasPrice = env->NewStringUTF(gasPrice.c_str());
+            jstring jdata = env->NewStringUTF(data.c_str());
+            jstring jresult = (jstring)env->CallObjectMethod(_obj, methodId, jfrom, jto, jamount, jgasPrice, jdata, id);
+
+            env->DeleteLocalRef(jfrom);
+            env->DeleteLocalRef(jto);
+            env->DeleteLocalRef(jamount);
+            env->DeleteLocalRef(jgasPrice);
+            env->DeleteLocalRef(jdata);
+            env->DeleteLocalRef(clazz);
+
+            return jstring2json(env, jresult);
+        }
+
+        nlohmann::json SubWalletCallback::GetBalance(const std::string &address, int id) {
+            JNIEnv *env = GetEnv();
+            jclass clazz = env->GetObjectClass(_obj);
+            jmethodID methodId = env->GetMethodID(clazz, "GetBalance",
+                                                  "(Ljava/lang/String;I)Ljava/lang/String;");
+            jstring jaddress = env->NewStringUTF(address.c_str());
+            jstring jresult = (jstring)env->CallObjectMethod(_obj, methodId, jaddress, id);
+
+            env->DeleteLocalRef(jaddress);
+            env->DeleteLocalRef(clazz);
+            return jstring2json(env, jresult);
+        }
+
+        nlohmann::json SubWalletCallback::SubmitTransaction(const std::string &tx, int id) {
+            JNIEnv *env = GetEnv();
+            jclass clazz = env->GetObjectClass(_obj);
+            jmethodID methodId = env->GetMethodID(clazz, "SubmitTransaction",
+                                                  "(Ljava/lang/String;I)Ljava/lang/String;");
+            jstring jtx = env->NewStringUTF(tx.c_str());
+            jstring jresult = (jstring)env->CallObjectMethod(_obj, methodId, jtx, id);
+
+            env->DeleteLocalRef(jtx);
+            env->DeleteLocalRef(clazz);
+
+            return jstring2json(env, jresult);
+        }
+
+        nlohmann::json SubWalletCallback::GetTransactions(const std::string &address, uint64_t begBlockNumber, uint64_t endBlockNumber, int id) {
+            JNIEnv *env = GetEnv();
+            jclass clazz = env->GetObjectClass(_obj);
+            jmethodID methodId = env->GetMethodID(clazz, "GetTransactions",
+                                                   "(Ljava/lang/String;JJI)Ljava/lang/String;");
+            jstring jaddress = env->NewStringUTF(address.c_str());
+            jstring jresult = (jstring)env->CallObjectMethod(_obj, methodId, jaddress, begBlockNumber, endBlockNumber, id);
+
+            env->DeleteLocalRef(jaddress);
+            env->DeleteLocalRef(clazz);
+
+            return jstring2json(env, jresult);
+        }
+
+        nlohmann::json SubWalletCallback::GetLogs(const std::string &contract,
+                                                    const std::string &address,
+                                                    const std::string &event,
+                                                    uint64_t begBlockNumber,
+										            uint64_t endBlockNumber,
+                                                    int id) {
+            JNIEnv *env = GetEnv();
+            jclass clazz = env->GetObjectClass(_obj);
+            jmethodID methodId = env->GetMethodID(clazz, "GetLogs",
+                                                  "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;JJI)Ljava/lang/String;");
+            jstring jcontract = env->NewStringUTF(contract.c_str());
+            jstring jaddress = env->NewStringUTF(address.c_str());
+            jstring jevent = env->NewStringUTF(event.c_str());
+            jstring jresult = (jstring)env->CallObjectMethod(_obj, methodId, jcontract, jaddress, jevent, begBlockNumber, endBlockNumber, id);
+
+            env->DeleteLocalRef(jcontract);
+            env->DeleteLocalRef(jaddress);
+            env->DeleteLocalRef(jevent);
+            env->DeleteLocalRef(clazz);
+
+            return jstring2json(env, jresult);
+        }
+
+        nlohmann::json SubWalletCallback::GetTokens(int id) {
+            JNIEnv *env = GetEnv();
+            jclass clazz = env->GetObjectClass(_obj);
+            jmethodID methodId = env->GetMethodID(clazz, "GetTokens",
+                                                  "(I)Ljava/lang/String;");
+            jstring jresult = (jstring)env->CallObjectMethod(_obj, methodId, id);
+
+            env->DeleteLocalRef(clazz);
+
+            return jstring2json(env, jresult);
+        }
+
+        nlohmann::json SubWalletCallback::GetBlockNumber(int id) {
+            JNIEnv *env = GetEnv();
+            jclass clazz = env->GetObjectClass(_obj);
+            jmethodID methodId = env->GetMethodID(clazz, "GetBlockNumber",
+                                                  "(I)Ljava/lang/String;");
+            jstring jresult = (jstring)env->CallObjectMethod(_obj, methodId, id);
+
+            env->DeleteLocalRef(clazz);
+
+            return jstring2json(env, jresult);
+        }
+
+        nlohmann::json SubWalletCallback::GetNonce(const std::string &address, int id) {
+            JNIEnv *env = GetEnv();
+            jclass clazz = env->GetObjectClass(_obj);
+            jmethodID methodId = env->GetMethodID(clazz, "GetNonce",
+                                                  "(Ljava/lang/String;I)Ljava/lang/String;");
+
+            jstring jaddress = env->NewStringUTF(address.c_str());
+            jstring jresult = (jstring)env->CallObjectMethod(_obj, methodId, jaddress, id);
+
+            env->DeleteLocalRef(jaddress);
+            env->DeleteLocalRef(clazz);
+
+            return jstring2json(env, jresult);
         }
     }
 }
