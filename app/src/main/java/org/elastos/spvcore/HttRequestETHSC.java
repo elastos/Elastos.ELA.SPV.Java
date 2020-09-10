@@ -158,16 +158,19 @@ public class HttRequestETHSC {
         String rpcUrl = "http://api.elastos.io:8080/api/1/eth/history?address=" + address + "&begBlockNumber=" + begBlockNumber
                 + "&endBlockNumber=" + endBlockNumber + "&sort=desc";
         String result = null;
-
+        Log.d(TAG, "GetTransactions getResponce:" + rpcUrl);
         try {
             URL url = new URL(rpcUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setConnectTimeout(5000);
             conn.setRequestMethod("GET");
             String originResult = getResponce(conn);
-            JSONObject resultObj = new JSONObject(originResult);
-            resultObj.put("id", id);
-            result = resultObj.toString();
+            Log.d(TAG, "GetTransactions getResponce:" + originResult);
+            if (originResult != null) {
+                JSONObject resultObj = new JSONObject(originResult);
+                resultObj.put("id", id);
+                result = resultObj.toString();
+            }
         } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
@@ -296,7 +299,6 @@ public class HttRequestETHSC {
             if (code == 200) {
                 int totalBytes = connection.getContentLength();
                 InputStream in = connection.getInputStream();
-                //TODO use stringreader?
                 ByteArrayOutputStream outStream = new ByteArrayOutputStream();
                 byte[] buffer = new byte[totalBytes];
                 int len = 0;
@@ -306,6 +308,7 @@ public class HttRequestETHSC {
                 in.close();
                 byte[] data =  outStream.toByteArray();
                 result = new String(data, "UTF-8");
+                Log.d(TAG, "httprequest result:" + result);
                 return result;
             }
         } catch (IOException e) {
@@ -313,6 +316,7 @@ public class HttRequestETHSC {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Log.d(TAG, "httprequest error result:" + result);
         return result;
     }
 }
