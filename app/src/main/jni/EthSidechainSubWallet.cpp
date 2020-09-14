@@ -38,7 +38,7 @@ static jstring JNICALL CreateTransfer(JNIEnv *env, jobject clazz, jlong instance
     return tx;
 }
 
-#define JNI_CreateTransferGeneric "(JLjava/lang/String;Ljava/lang/String;ILjava/lang/String;ILjava/lang/String;Ljava/lang/String)Ljava/lang/String;"
+#define JNI_CreateTransferGeneric "(JLjava/lang/String;Ljava/lang/String;ILjava/lang/String;ILjava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
 
 static jstring JNICALL CreateTransferGeneric(JNIEnv *env, jobject clazz, jlong instance,
                                         jstring jtargetAddress, jstring jamount, jint amountUnit,
@@ -78,7 +78,7 @@ static jstring JNICALL CreateTransferGeneric(JNIEnv *env, jobject clazz, jlong i
 
 static const JNINativeMethod methods[] = {
     REGISTER_METHOD(CreateTransfer),
-    // REGISTER_METHOD(CreateTransferGeneric),
+    REGISTER_METHOD(CreateTransferGeneric),
 };
 
 jint RegisterEthSidechainSubWallet(JNIEnv *env, const std::string &path) {
