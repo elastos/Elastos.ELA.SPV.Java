@@ -20,6 +20,10 @@ public class EthSidechainSubWallet extends SubWallet {
         return CreateTransferGeneric(mInstance, targetAddress, amount, amountUnit, gasPrice, gasPriceUnit, gasLimit, data);
     }
 
+    public void DeleteTransfer(String tx) throws WalletException {
+        DeleteTransfer(mInstance, tx);
+    }
+
     public EthSidechainSubWallet(long instance) {
         super(instance);
         mInstance = instance;
@@ -29,4 +33,6 @@ public class EthSidechainSubWallet extends SubWallet {
 
     private native String CreateTransferGeneric(long instance, String targetAddress, String amount, int amountUnit,
                                                 String gasPrice, int gasPriceUnit, String gasLimit, String data);
+
+    private native void DeleteTransfer(long instance, String tx);
 }

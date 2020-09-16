@@ -20,11 +20,11 @@ public class SubWalletCallback {
         return mInstance;
     }
 
-    public SubWalletCallback(String masterWalletID, String subWalletID, String apiUrl, ISubWalletListener listener) {
+    public SubWalletCallback(String masterWalletID, String subWalletID, String ethscRPC, String ethscApiMisc, ISubWalletListener listener) {
         mMasterWalletID = masterWalletID;
         mSubWalletID = subWalletID;
         mListener = listener;
-        jsonRPC = new HttRequestETHSC(apiUrl);
+        jsonRPC = new HttRequestETHSC(ethscRPC, ethscApiMisc);
         mInstance = InitSubWalletCallback();
     }
 

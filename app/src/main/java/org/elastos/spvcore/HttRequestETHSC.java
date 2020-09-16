@@ -19,12 +19,15 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 public class HttRequestETHSC {
-    private String apiUrl;
+    private String ethscRPC;
+    private String ethscApiMisc;
+    private String getTransactionsUrlPrefix;
     private String TAG = "HttRequestETHSC";
 
-    HttRequestETHSC(String url) {
-        this.apiUrl = url;
-//        Log.d(TAG, "apiUrl: " + this.apiUrl);
+    HttRequestETHSC(String ethscRPC, String ethscApiMisc) {
+        this.ethscRPC = ethscRPC;
+        this.ethscApiMisc = ethscApiMisc;
+        this.getTransactionsUrlPrefix = this.ethscApiMisc + "/api/1/eth/history?address=";
     }
 
     public String GetPrice(int id) {
@@ -32,7 +35,7 @@ public class HttRequestETHSC {
         String result = null;
         try {
             Log.d(TAG, "GetPrice");
-            connection = getConnection(this.apiUrl);
+            connection = getConnection();
             OutputStream os = connection.getOutputStream();
             JsonFactory factory = new JsonFactory();
             JsonGenerator generator = factory.createGenerator(os, JsonEncoding.UTF8);
@@ -59,7 +62,7 @@ public class HttRequestETHSC {
         String result = null;
         try {
             Log.d(TAG, "EstimateGas");
-            connection = getConnection(this.apiUrl);
+            connection = getConnection();
             OutputStream os = connection.getOutputStream();
             JsonFactory factory = new JsonFactory();
             JsonGenerator generator = factory.createGenerator(os, JsonEncoding.UTF8);
@@ -96,7 +99,7 @@ public class HttRequestETHSC {
         String result = null;
         try {
             Log.d(TAG, "GetBalance address:" + address);
-            connection = getConnection(this.apiUrl);
+            connection = getConnection();
             OutputStream os = connection.getOutputStream();
             JsonFactory factory = new JsonFactory();
             JsonGenerator generator = factory.createGenerator(os, JsonEncoding.UTF8);
@@ -128,7 +131,7 @@ public class HttRequestETHSC {
         String result = null;
         try {
             Log.d(TAG, "SubmitTransaction tx:" + tx);
-            connection = getConnection(this.apiUrl);
+            connection = getConnection();
             OutputStream os = connection.getOutputStream();
             JsonFactory factory = new JsonFactory();
             JsonGenerator generator = factory.createGenerator(os, JsonEncoding.UTF8);
@@ -155,17 +158,16 @@ public class HttRequestETHSC {
     }
 
     public String GetTransactions(String address, long begBlockNumber, long endBlockNumber, int id) {
-        String rpcUrl = "http://api.elastos.io:8080/api/1/eth/history?address=" + address + "&begBlockNumber=" + begBlockNumber
+        String rpcUrl = this.getTransactionsUrlPrefix + address + "&begBlockNumber=" + begBlockNumber
                 + "&endBlockNumber=" + endBlockNumber + "&sort=desc";
         String result = null;
-        Log.d(TAG, "GetTransactions getResponce:" + rpcUrl);
+        Log.d(TAG, "GetTransactions rpcUrl:" + rpcUrl);
         try {
             URL url = new URL(rpcUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(5000);
+            conn.setConnectTimeout(10000);
             conn.setRequestMethod("GET");
             String originResult = getResponce(conn);
-            Log.d(TAG, "GetTransactions getResponce:" + originResult);
             if (originResult != null) {
                 JSONObject resultObj = new JSONObject(originResult);
                 resultObj.put("id", id);
@@ -185,7 +187,7 @@ public class HttRequestETHSC {
             //TODO: temp, spvsdk will fix it
             String address = address1.replaceAll("000000000000000000000000", "");
             Log.d(TAG, "GetLogs address:" + address);
-            connection = getConnection(this.apiUrl);
+            connection = getConnection();
             OutputStream os = connection.getOutputStream();
             JsonFactory factory = new JsonFactory();
             JsonGenerator generator = factory.createGenerator(os, JsonEncoding.UTF8);
@@ -220,7 +222,7 @@ public class HttRequestETHSC {
         String result = null;
         try {
             Log.d(TAG, "GetBlockNumber");
-            connection = getConnection(this.apiUrl);
+            connection = getConnection();
             OutputStream os = connection.getOutputStream();
             JsonFactory factory = new JsonFactory();
             JsonGenerator generator = factory.createGenerator(os, JsonEncoding.UTF8);
@@ -247,7 +249,7 @@ public class HttRequestETHSC {
         String result = null;
         try {
             Log.d(TAG, "GetNonce address:" + address);
-            connection = getConnection(this.apiUrl);
+            connection = getConnection();
             OutputStream os = connection.getOutputStream();
             JsonFactory factory = new JsonFactory();
             JsonGenerator generator = factory.createGenerator(os, JsonEncoding.UTF8);
@@ -278,8 +280,8 @@ public class HttRequestETHSC {
         return "{}";
     }
 
-    private HttpURLConnection getConnection(String apiurl) throws IOException {
-        URL url = new URL(apiurl);
+    private HttpURLConnection getConnection() throws IOException {
+        URL url = new URL(this.ethscRPC);
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("User-Agent",
@@ -298,6 +300,7 @@ public class HttRequestETHSC {
             int code = connection.getResponseCode();
             if (code == 200) {
                 int totalBytes = connection.getContentLength();
+                Log.d(TAG, "httprequest totalBytes:" + totalBytes);
                 InputStream in = connection.getInputStream();
                 ByteArrayOutputStream outStream = new ByteArrayOutputStream();
                 byte[] buffer = new byte[totalBytes];

@@ -76,9 +76,34 @@ static jstring JNICALL CreateTransferGeneric(JNIEnv *env, jobject clazz, jlong i
     return tx;
 }
 
+#define JNI_DeleteTransfer "(JLjava/lang/String;)V"
+
+static void JNICALL DeleteTransfer(JNIEnv *env, jobject clazz, jlong instance,
+                                        jstring jtx) {
+    bool exception = false;
+    std::string msgException;
+
+    IEthSidechainSubWallet *wallet = (IEthSidechainSubWallet *) instance;
+    const char *tx = env->GetStringUTFChars(jtx, NULL);
+
+    try {
+        wallet->DeleteTransfer(nlohmann::json::parse(tx));
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jtx, tx);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+}
+
 static const JNINativeMethod methods[] = {
     REGISTER_METHOD(CreateTransfer),
     REGISTER_METHOD(CreateTransferGeneric),
+    REGISTER_METHOD(DeleteTransfer),
 };
 
 jint RegisterEthSidechainSubWallet(JNIEnv *env, const std::string &path) {
