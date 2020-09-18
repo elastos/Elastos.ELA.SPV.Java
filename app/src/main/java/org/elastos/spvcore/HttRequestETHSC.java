@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -171,6 +172,20 @@ public class HttRequestETHSC {
             if (originResult != null) {
                 JSONObject resultObj = new JSONObject(originResult);
                 resultObj.put("id", id);
+
+                JSONArray nameList = resultObj.getJSONArray("result");
+                int length = nameList.length();
+                for(int i = 0; i < length; i++) {
+                    JSONObject jsonObject = nameList.getJSONObject(i);
+                    transformJSONObjKey(jsonObject, "contractAddress", "contract");
+                    transformJSONObjKey(jsonObject, "value", "amount");
+                    transformJSONObjKey(jsonObject, "input", "data");
+                    transformJSONObjKey(jsonObject, "confirmations", "blockConfirmations");
+                    transformJSONObjKey(jsonObject, "transactionIndex", "blockTransactionIndex");
+                    transformJSONObjKey(jsonObject, "timeStamp", "blockTimestamp");
+                    jsonObject.put("gasLimit", "5012644");
+                }
+
                 result = resultObj.toString();
             }
         } catch (IOException | JSONException e) {
@@ -299,19 +314,8 @@ public class HttRequestETHSC {
         try {
             int code = connection.getResponseCode();
             if (code == 200) {
-                int totalBytes = connection.getContentLength();
-                Log.d(TAG, "httprequest totalBytes:" + totalBytes);
-                InputStream in = connection.getInputStream();
-                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-                byte[] buffer = new byte[totalBytes];
-                int len = 0;
-                while((len = in.read(buffer)) != -1) {
-                    outStream.write(buffer,0, len);
-                }
-                in.close();
-                byte[] data =  outStream.toByteArray();
-                result = new String(data, "UTF-8");
-                Log.d(TAG, "httprequest result:" + result);
+                InputStream is = connection.getInputStream();
+                result = readStream(is);
                 return result;
             }
         } catch (IOException e) {
@@ -321,5 +325,34 @@ public class HttRequestETHSC {
         }
         Log.d(TAG, "httprequest error result:" + result);
         return result;
+    }
+
+    private String readStream(InputStream in) {
+        try {
+            ByteArrayOutputStream baoStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int len = -1;
+            while ((len = in.read(buffer)) != -1) {
+                baoStream.write(buffer, 0, len);
+            }
+            String content = baoStream.toString();
+            in.close();
+            baoStream.close();
+            return content;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void transformJSONObjKey(JSONObject jsonObj, String originKey, String newKey) {
+        String value = null;
+        try {
+            value = jsonObj.getString(originKey);
+            jsonObj.put(newKey, value);
+            jsonObj.remove(originKey);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
