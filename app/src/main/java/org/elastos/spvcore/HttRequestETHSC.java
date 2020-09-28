@@ -35,7 +35,7 @@ public class HttRequestETHSC {
         HttpURLConnection connection = null;
         String result = null;
         try {
-            Log.d(TAG, "GetPrice");
+            // Log.d(TAG, "GetPrice");
             connection = getConnection();
             OutputStream os = connection.getOutputStream();
             JsonFactory factory = new JsonFactory();
@@ -62,7 +62,7 @@ public class HttRequestETHSC {
         HttpURLConnection connection = null;
         String result = null;
         try {
-            Log.d(TAG, "EstimateGas");
+            // Log.d(TAG, "EstimateGas");
             connection = getConnection();
             OutputStream os = connection.getOutputStream();
             JsonFactory factory = new JsonFactory();
@@ -99,7 +99,7 @@ public class HttRequestETHSC {
         HttpURLConnection connection = null;
         String result = null;
         try {
-            Log.d(TAG, "GetBalance address:" + address);
+            // Log.d(TAG, "GetBalance address:" + address);
             connection = getConnection();
             OutputStream os = connection.getOutputStream();
             JsonFactory factory = new JsonFactory();
@@ -148,6 +148,7 @@ public class HttRequestETHSC {
             os.close();
 
             result = getResponce(connection);
+            Log.d(TAG, "SubmitTransaction result:" + result);
         } catch (MalformedURLException | ProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -162,7 +163,7 @@ public class HttRequestETHSC {
         String rpcUrl = this.getTransactionsUrlPrefix + address + "&begBlockNumber=" + begBlockNumber
                 + "&endBlockNumber=" + endBlockNumber + "&sort=desc";
         String result = null;
-        Log.d(TAG, "GetTransactions rpcUrl:" + rpcUrl);
+        // Log.d(TAG, "GetTransactions rpcUrl:" + rpcUrl);
         try {
             URL url = new URL(rpcUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -201,7 +202,7 @@ public class HttRequestETHSC {
         try {
             //TODO: temp, spvsdk will fix it
             String address = address1.replaceAll("000000000000000000000000", "");
-            Log.d(TAG, "GetLogs address:" + address);
+            // Log.d(TAG, "GetLogs address:" + address);
             connection = getConnection();
             OutputStream os = connection.getOutputStream();
             JsonFactory factory = new JsonFactory();
@@ -236,7 +237,7 @@ public class HttRequestETHSC {
         HttpURLConnection connection = null;
         String result = null;
         try {
-            Log.d(TAG, "GetBlockNumber");
+            // Log.d(TAG, "GetBlockNumber");
             connection = getConnection();
             OutputStream os = connection.getOutputStream();
             JsonFactory factory = new JsonFactory();
@@ -263,7 +264,7 @@ public class HttRequestETHSC {
         HttpURLConnection connection = null;
         String result = null;
         try {
-            Log.d(TAG, "GetNonce address:" + address);
+            // Log.d(TAG, "GetNonce address:" + address);
             connection = getConnection();
             OutputStream os = connection.getOutputStream();
             JsonFactory factory = new JsonFactory();
@@ -281,6 +282,7 @@ public class HttRequestETHSC {
             os.close();
 
             result = getResponce(connection);
+//            Log.d(TAG, "GetNonce address:" + address + " result:" + result);
         } catch (MalformedURLException | ProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {

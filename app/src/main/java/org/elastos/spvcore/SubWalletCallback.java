@@ -163,7 +163,7 @@ public class SubWalletCallback {
 
     public void OnETHSCEventHandled(String event) {
         JSONObject jsonObject = new JSONObject();
-
+        Log.i(TAG, GetWalletID() + "[OnETHSCEventHandled] event=" + event);
         try {
             jsonObject.put("event", new JSONObject(event));
             jsonObject.put("MasterWalletID", mMasterWalletID);

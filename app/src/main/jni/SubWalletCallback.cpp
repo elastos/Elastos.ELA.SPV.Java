@@ -135,7 +135,7 @@ namespace Elastos {
         }
 
         void SubWalletCallback::OnETHSCEventHandled(const nlohmann::json &event) {
-            LOGD("MYTEST", "----OnETHSCEventHandled %s", event.dump().c_str());
+            // LOGD("MYTEST", "----OnETHSCEventHandled %s", event.dump().c_str());
             JNIEnv *env = GetEnv();
             jstring jevent = env->NewStringUTF(event.dump().c_str());
 

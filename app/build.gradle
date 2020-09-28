@@ -1,10 +1,11 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 28
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 26
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
 
@@ -35,7 +36,7 @@ android {
 
     android.libraryVariants.all { variant ->
         variant.outputs.all {
-            def fileName = "org.elastos.wallet-" + variant.buildType.name + '.aar'
+            def fileName = "org.elastos.spvcore-" + variant.buildType.name + '.aar'
             outputFileName = fileName
         }
     }
@@ -51,4 +52,16 @@ dependencies {
     api 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+
+
+publish {
+    userOrg = 'trinity-tech'
+    groupId = 'org.elastos'
+    artifactId = 'spvcore'
+    publishVersion = '0.5.7.1'
+    desc = 'Elastos Wallet SDK'
+    repoName = 'Elastos.ELA.SPV.Java'
+    website = 'https://gitlab.com/elastos/Elastos.ELA.SPV.Java'
 }
