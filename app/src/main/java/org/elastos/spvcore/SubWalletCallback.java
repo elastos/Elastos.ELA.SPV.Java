@@ -163,7 +163,7 @@ public class SubWalletCallback {
 
     public void OnETHSCEventHandled(String event) {
         JSONObject jsonObject = new JSONObject();
-        Log.i(TAG, GetWalletID() + "[OnETHSCEventHandled] event=" + event);
+        // Log.i(TAG, GetWalletID() + "[OnETHSCEventHandled] event=" + event);
         try {
             jsonObject.put("event", new JSONObject(event));
             jsonObject.put("MasterWalletID", mMasterWalletID);
@@ -178,48 +178,48 @@ public class SubWalletCallback {
 
     // ETH sidechain callback: send result to spvsdk, not user
     public String GasPrice(int id) {
-//        Log.d(TAG, "GasPrice id:" + id);
+        // Log.d(TAG, "GasPrice id:" + id);
         return this.jsonRPC.GetPrice(id);
     }
 
     public String EstimateGas(String from, String to, String amount,
             String gasPrice, String data, int id) {
-//        Log.d(TAG, "EstimateGas");
+        // Log.d(TAG, "EstimateGas");
         return this.jsonRPC.EstimateGas(from, to, amount, gasPrice, data, id);
     }
 
     public String GetBalance(String address, int id) {
-//        Log.d(TAG, "GetBalance address:" + address + " id:" + id);
+        // Log.d(TAG, "GetBalance address:" + address + " id:" + id);
         return this.jsonRPC.GetBalance(address, id);
     }
 
     public String SubmitTransaction(String tx, int id) {
-//        Log.d(TAG, "SubmitTransaction：" + tx);
+        // Log.d(TAG, "SubmitTransaction：" + tx);
         return this.jsonRPC.SubmitTransaction(tx, id);
     }
 
      public String GetTransactions(String address, long begBlockNumber, long endBlockNumber, int id) {
-        Log.d(TAG, "GetTransactions address:" + address + " [" + begBlockNumber + " , " + endBlockNumber + " ] id:" + id);
+        // Log.d(TAG, "GetTransactions address:" + address + " [" + begBlockNumber + " , " + endBlockNumber + " ] id:" + id);
         return this.jsonRPC.GetTransactions(address, begBlockNumber, endBlockNumber, id);
     }
 
     public String GetLogs(String contract, String address, String event, long begBlockNumber, long endBlockNumber, int id) {
-        Log.d(TAG, "GetLogs id:" + id);
+        // Log.d(TAG, "GetLogs id:" + id);
         return this.jsonRPC.GetLogs(contract, address, event, begBlockNumber, endBlockNumber, id);
     }
 
     public String GetTokens(int id) {
-        Log.d(TAG, "GetTokens");
-        return "{}";
+        // Log.d(TAG, "GetTokens");
+        return this.jsonRPC.GetTokens(id);
     }
 
     public String GetBlockNumber(int id) {
-//        Log.d(TAG, "GetBlockNumber id:" + id);
+        // Log.d(TAG, "GetBlockNumber id:" + id);
         return this.jsonRPC.GetBlockNumber(id);
     }
 
     public String GetNonce(String address, int id) {
-        Log.d(TAG, "GetNonce address:" + address + " id:" + id);
+        // Log.d(TAG, "GetNonce address:" + address + " id:" + id);
         return this.jsonRPC.GetNonce(address, id);
     }
 

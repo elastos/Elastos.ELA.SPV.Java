@@ -100,10 +100,41 @@ static void JNICALL DeleteTransfer(JNIEnv *env, jobject clazz, jlong instance,
     }
 }
 
+#define JNI_GetTokenTransactions "(JIILjava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL GetTokenTransactions(JNIEnv *env, jobject clazz, jlong instance,
+                                        jint start, jint count, jstring jtxid, jstring jtokenSymble) {
+    bool exception = false;
+    std::string msgException;
+
+    IEthSidechainSubWallet *wallet = (IEthSidechainSubWallet *) instance;
+    const char *txid = env->GetStringUTFChars(jtxid, NULL);
+    const char *tokenSymble = env->GetStringUTFChars(jtokenSymble, NULL);
+    jstring tx = NULL;
+
+    try {
+        nlohmann::json txJson = wallet->GetTokenTransactions(start, count, txid, tokenSymble);
+        tx = env->NewStringUTF(txJson.dump().c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jtxid, txid);
+    env->ReleaseStringUTFChars(jtokenSymble, tokenSymble);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return tx;
+}
+
 static const JNINativeMethod methods[] = {
     REGISTER_METHOD(CreateTransfer),
     REGISTER_METHOD(CreateTransferGeneric),
     REGISTER_METHOD(DeleteTransfer),
+    REGISTER_METHOD(GetTokenTransactions),
 };
 
 jint RegisterEthSidechainSubWallet(JNIEnv *env, const std::string &path) {

@@ -24,6 +24,10 @@ public class EthSidechainSubWallet extends SubWallet {
         DeleteTransfer(mInstance, tx);
     }
 
+    public String GetTokenTransactions(int start, int count, String txid, String tokenSymbol) throws WalletException {
+        return GetTokenTransactions(mInstance, start, count, txid, tokenSymbol);
+    }
+
     public EthSidechainSubWallet(long instance) {
         super(instance);
         mInstance = instance;
@@ -35,4 +39,6 @@ public class EthSidechainSubWallet extends SubWallet {
                                                 String gasPrice, int gasPriceUnit, String gasLimit, String data);
 
     private native void DeleteTransfer(long instance, String tx);
+
+    private native String GetTokenTransactions(long instance, int start, int count, String txid, String tokenSymbol);
 }
