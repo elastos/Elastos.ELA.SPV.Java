@@ -23,12 +23,14 @@ public class HttRequestETHSC {
     private String ethscRPC;
     private String ethscApiMisc;
     private String getTransactionsUrlPrefix;
+    private String getTokensUrlPrefix;
     private String TAG = "HttRequestETHSC";
 
     HttRequestETHSC(String ethscRPC, String ethscApiMisc) {
         this.ethscRPC = ethscRPC;
         this.ethscApiMisc = ethscApiMisc;
         this.getTransactionsUrlPrefix = this.ethscApiMisc + "/api/1/eth/history?address=";
+        this.getTokensUrlPrefix = this.ethscApiMisc + "/api/1/eth/erc20/list";
     }
 
     public String GetPrice(int id) {
@@ -298,31 +300,49 @@ public class HttRequestETHSC {
     }
 
     public String GetTokens(int id) {
-        JSONObject tokenObj = new JSONObject();
-        // TestNet
+        String result = null;
+        // Log.d(TAG, "GetTokens");
         try {
-            tokenObj.put("address", "0xfdce7fb4050cd43c654c6cecead950343990ce75");
-            tokenObj.put("symbol", "TTECH");
-            tokenObj.put("name", "TTECH");
-            tokenObj.put("description", "TTECH");
-            tokenObj.put("decimals", 0);
-            tokenObj.put("defaultGasLimit", "");
-            tokenObj.put("defaultGasPrice", "");
+            URL url = new URL(this.getTokensUrlPrefix);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(10000);
+            conn.setRequestMethod("GET");
+            String originResult = getResponce(conn);
 
-            JSONArray tokenArray = new JSONArray();
-            tokenArray.put(tokenObj);
-
-            JSONObject resultObj = new JSONObject();
+            JSONObject resultObj = new JSONObject(originResult);
             resultObj.put("id", id);
-            resultObj.put("result", tokenArray);
-            Log.d(TAG, "GetTokens result:" + resultObj.toString());
-            return resultObj.toString();
-        } catch (JSONException e) {
+            result = resultObj.toString();
+
+        } catch (IOException | JSONException e) {
             e.printStackTrace();
-            Log.d(TAG, "GetTokens exception:" + e.getMessage());
         }
 
-        return "{}";
+        return result;
+        // JSONObject tokenObj = new JSONObject();
+        // // TestNet
+        // try {
+        //     tokenObj.put("address", "0xfdce7fb4050cd43c654c6cecead950343990ce75");
+        //     tokenObj.put("symbol", "TTECH");
+        //     tokenObj.put("name", "TTECH");
+        //     tokenObj.put("description", "TTECH");
+        //     tokenObj.put("decimals", 0);
+        //     tokenObj.put("defaultGasLimit", "");
+        //     tokenObj.put("defaultGasPrice", "");
+
+        //     JSONArray tokenArray = new JSONArray();
+        //     tokenArray.put(tokenObj);
+
+        //     JSONObject resultObj = new JSONObject();
+        //     resultObj.put("id", id);
+        //     resultObj.put("result", tokenArray);
+        //     Log.d(TAG, "GetTokens result:" + resultObj.toString());
+        //     return resultObj.toString();
+        // } catch (JSONException e) {
+        //     e.printStackTrace();
+        //     Log.d(TAG, "GetTokens exception:" + e.getMessage());
+        // }
+
+        // return "{}";
     }
 
     private HttpURLConnection getConnection() throws IOException {
