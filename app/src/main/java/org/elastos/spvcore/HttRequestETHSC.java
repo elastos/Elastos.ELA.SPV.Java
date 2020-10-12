@@ -308,11 +308,11 @@ public class HttRequestETHSC {
             conn.setConnectTimeout(10000);
             conn.setRequestMethod("GET");
             String originResult = getResponce(conn);
-
-            JSONObject resultObj = new JSONObject(originResult);
-            resultObj.put("id", id);
-            result = resultObj.toString();
-
+            if (originResult != null) {
+                JSONObject resultObj = new JSONObject(originResult);
+                resultObj.put("id", id);
+                result = resultObj.toString();
+            }
         } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
