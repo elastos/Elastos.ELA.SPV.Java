@@ -214,6 +214,36 @@ IsAddressValid(JNIEnv *env, jobject clazz, jlong instance, jstring jaddress) {
     return (jboolean) valid;
 }
 
+#define JNI_IsSubWalletAddressValid "(JLjava/lang/String;Ljava/lang/String;)Z"
+
+static jboolean JNICALL
+IsSubWalletAddressValid(JNIEnv *env, jobject clazz, jlong instance, jstring jChainID, jstring jaddress) {
+    bool exception = false;
+    std::string msgException;
+
+    const char *chainID = env->GetStringUTFChars(jChainID, NULL);
+    const char *address = env->GetStringUTFChars(jaddress, NULL);
+
+    IMasterWallet *masterWallet = (IMasterWallet *) instance;
+    bool valid = false;
+
+    try {
+        valid = masterWallet->IsSubWalletAddressValid(chainID, address);
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jChainID, chainID);
+    env->ReleaseStringUTFChars(jaddress, address);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return (jboolean) valid;
+}
+
 #define JNI_GetSupportedChains "(J)[Ljava/lang/String;"
 
 static jobjectArray JNICALL GetSupportedChains(JNIEnv *env, jobject clazz, jlong instance) {
@@ -515,6 +545,7 @@ static const JNINativeMethod methods[] = {
         REGISTER_METHOD(CreateSubWallet),
         REGISTER_METHOD(DestroyWallet),
         REGISTER_METHOD(IsAddressValid),
+        REGISTER_METHOD(IsSubWalletAddressValid),
         REGISTER_METHOD(GetSupportedChains),
         REGISTER_METHOD(ChangePassword),
         REGISTER_METHOD(ResetPassword),

@@ -129,6 +129,10 @@ public class MasterWallet {
         return IsAddressValid(mInstance, address);
     }
 
+    public boolean IsSubWalletAddressValid(String chainID, String address) throws WalletException {
+        return IsSubWalletAddressValid(mInstance, chainID, address);
+    }
+
     public String[] GetSupportedChains() throws WalletException {
         return GetSupportedChains(mInstance);
     }
@@ -198,6 +202,8 @@ public class MasterWallet {
     private native void DestroyWallet(long instance, String chainID);
 
     private native boolean IsAddressValid(long instance, String address);
+
+    private native boolean IsSubWalletAddressValid(long instance, String chainID, String address);
 
     private native String[] GetSupportedChains(long instance);
 
