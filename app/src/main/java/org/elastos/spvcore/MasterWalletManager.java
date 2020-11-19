@@ -260,6 +260,10 @@ public class MasterWalletManager {
 
     public void FlushData() { FlushData(mInstance); }
 
+    public void SetLogLevel(String loglevel) throws WalletException {
+        SetLogLevel(mInstance, loglevel);
+    }
+
     private native String GenerateMnemonic(long instance, String language, int wordCount);
 
     private native long CreateMasterWallet(
@@ -295,6 +299,8 @@ public class MasterWalletManager {
     private native void DestroyWallet(long instance, String masterWalletId);
 
     private native void FlushData(long mInstance);
+
+    private native void SetLogLevel(long instance, String loglevel);
 
     private native long[] GetAllMasterWallets(long instance);
 

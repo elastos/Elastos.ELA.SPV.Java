@@ -329,18 +329,21 @@ static jlong JNICALL ImportReadonlyWallet(JNIEnv *env, jobject clazz, jlong inst
     std::string msgException;
 
     const char *masterWalletID = env->GetStringUTFChars(jmasterWalletID, NULL);
-    const char *walletJosn = env->GetStringUTFChars(jwalletJson, NULL);
+    const char *walletJasn = env->GetStringUTFChars(jwalletJson, NULL);
 
     MasterWalletManager *manager = (MasterWalletManager *) instance;
     IMasterWallet *masterWallet = NULL;
 
     try {
         masterWallet = manager->ImportReadonlyWallet(masterWalletID,
-                                                     nlohmann::json::parse(walletJosn));
+                                                     nlohmann::json::parse(walletJasn));
     } catch (const std::exception &e) {
         exception = true;
         msgException = e.what();
     }
+
+    env->ReleaseStringUTFChars(jmasterWalletID, masterWalletID);
+    env->ReleaseStringUTFChars(jwalletJson, walletJasn);
 
     if (exception) {
         ThrowWalletException(env, msgException.c_str());
@@ -388,6 +391,31 @@ static void JNICALL FlushData(JNIEnv *env, jobject clazz, jlong instance) {
         exception = true;
         msgException = e.what();
     }
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+}
+
+#define JNI_SetLogLevel "(JLjava/lang/String;)V"
+
+static void JNICALL SetLogLevel(JNIEnv *env, jobject clazz, jlong instance,
+                                  jstring jloglevel) {
+    bool exception = false;
+    std::string msgException;
+
+    const char *loglevel = env->GetStringUTFChars(jloglevel, NULL);
+
+    MasterWalletManager *walletManager = (MasterWalletManager *) instance;
+
+    try {
+        walletManager->SetLogLevel(loglevel);
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jloglevel, loglevel);
 
     if (exception) {
         ThrowWalletException(env, msgException.c_str());
@@ -531,6 +559,7 @@ static const JNINativeMethod methods[] = {
         REGISTER_METHOD(InitMasterWalletManager),
         REGISTER_METHOD(DisposeNative),
         REGISTER_METHOD(FlushData),
+        REGISTER_METHOD(SetLogLevel),
 };
 
 jint RegisterMasterWalletManager(JNIEnv *env, const std::string &path) {
