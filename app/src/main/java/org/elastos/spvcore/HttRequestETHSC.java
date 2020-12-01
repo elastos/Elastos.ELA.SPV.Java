@@ -201,13 +201,11 @@ public class HttRequestETHSC {
         return result;
     }
 
-    public String GetLogs(String contract, String address1, String event, long begBlockNumber, long endBlockNumber, int id) {
+    public String GetLogs(String contract, String address, String event, long begBlockNumber, long endBlockNumber, int id) {
         HttpURLConnection connection = null;
         String result = null;
         try {
-            //TODO: temp, spvsdk will fix it
-            String address = address1.replaceAll("000000000000000000000000", "");
-            Log.d(TAG, "GetLogs address:" + address);
+//            Log.d(TAG, "GetLogs address:" + address + " event:" + event + " begBlockNumber" + begBlockNumber + " endBlockNumber:" + endBlockNumber + " contract:" + contract);
             connection = getConnection();
             OutputStream os = connection.getOutputStream();
             JsonFactory factory = new JsonFactory();
@@ -218,7 +216,14 @@ public class HttRequestETHSC {
             generator.writeFieldName("params");
             generator.writeStartArray();
             generator.writeStartObject();
-            generator.writeStringField("address", address);
+
+            generator.writeFieldName("topics");
+            generator.writeStartArray();
+            generator.writeString(event);
+            generator.writeNull();
+            generator.writeString(address);
+            generator.writeEndArray();
+
             generator.writeStringField( "fromBlock", "0x" + Long.toString(begBlockNumber, 16));
             generator.writeStringField( "toBlock", "0x" + Long.toString(endBlockNumber, 16));
             generator.writeEndObject();
@@ -301,7 +306,7 @@ public class HttRequestETHSC {
 
     public String GetTokens(int id) {
         String result = null;
-        // Log.d(TAG, "GetTokens");
+//         Log.d(TAG, "GetTokens");
         try {
             URL url = new URL(this.getTokensUrlPrefix);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -311,38 +316,56 @@ public class HttRequestETHSC {
             if (originResult != null) {
                 JSONObject resultObj = new JSONObject(originResult);
                 resultObj.put("id", id);
+
+                // TODO: if the spvsdk use string for decimals, then remove this code.
+                JSONArray tokenList = resultObj.getJSONArray("result");
+                int length = tokenList.length();
+                for(int i = 0; i < length; i++) {
+                    JSONObject jsonObject = tokenList.getJSONObject(i);
+                    String value = jsonObject.getString("decimals");
+                    int decimalsDefault = 18;
+                    try {
+                        decimalsDefault = Integer.parseInt(value);
+                    }
+                    catch (Exception e) {
+                        Log.e(TAG, "Integer.parseInt error:" + e.getMessage());
+                    }
+                    jsonObject.put("decimals", decimalsDefault);
+                }
+
                 result = resultObj.toString();
+
             }
         } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
-
         return result;
-        // JSONObject tokenObj = new JSONObject();
-        // // TestNet
-        // try {
-        //     tokenObj.put("address", "0xfdce7fb4050cd43c654c6cecead950343990ce75");
-        //     tokenObj.put("symbol", "TTECH");
-        //     tokenObj.put("name", "TTECH");
-        //     tokenObj.put("description", "TTECH");
-        //     tokenObj.put("decimals", 0);
-        //     tokenObj.put("defaultGasLimit", "");
-        //     tokenObj.put("defaultGasPrice", "");
 
-        //     JSONArray tokenArray = new JSONArray();
-        //     tokenArray.put(tokenObj);
-
-        //     JSONObject resultObj = new JSONObject();
-        //     resultObj.put("id", id);
-        //     resultObj.put("result", tokenArray);
-        //     Log.d(TAG, "GetTokens result:" + resultObj.toString());
-        //     return resultObj.toString();
-        // } catch (JSONException e) {
-        //     e.printStackTrace();
-        //     Log.d(TAG, "GetTokens exception:" + e.getMessage());
-        // }
-
-        // return "{}";
+//         JSONObject tokenObj = new JSONObject();
+//         // TestNet
+//         try {
+//             tokenObj.put("address", "0xfdce7fb4050cd43c654c6cecead950343990ce75");
+//             tokenObj.put("symbol", "TTECH");
+//             tokenObj.put("name", "Trinity Tech");
+//             tokenObj.put("description", "TTECH");
+//             tokenObj.put("decimals", 0);
+//             tokenObj.put("defaultGasLimit", "");
+//             tokenObj.put("defaultGasPrice", "");
+//
+//             JSONArray tokenArray = new JSONArray();
+//             tokenArray.put(tokenObj);
+//
+//             JSONObject resultObj = new JSONObject();
+//             resultObj.put("id", id);
+//             resultObj.put("result", tokenArray);
+//             Log.d(TAG, "GetTokens result:" + resultObj.toString());
+//             return resultObj.toString();
+//         } catch (JSONException e) {
+//             e.printStackTrace();
+//             Log.d(TAG, "GetTokens exception:" + e.getMessage());
+//         }
+//
+//         return "{}";
     }
 
     private HttpURLConnection getConnection() throws IOException {
