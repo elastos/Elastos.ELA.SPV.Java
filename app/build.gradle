@@ -60,7 +60,7 @@ publish {
     userOrg = 'trinity-tech'
     groupId = 'org.elastos'
     artifactId = 'spvcore'
-    publishVersion = '0.5.7.6'
+    publishVersion = '0.5.7.9'
     desc = 'Elastos Wallet SDK'
     repoName = 'Elastos.ELA.SPV.Java'
     website = 'https://gitlab.com/elastos/Elastos.ELA.SPV.Java'
