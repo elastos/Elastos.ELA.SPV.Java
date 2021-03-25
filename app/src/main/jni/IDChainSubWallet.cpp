@@ -8,23 +8,25 @@
 
 using namespace Elastos::ElaWallet;
 
-#define JNI_CreateIDTransaction "(JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+#define JNI_CreateIDTransaction "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
 
 static jstring JNICALL CreateIDTransaction(JNIEnv *env, jobject clazz, jlong instance,
                                            jstring jpayloadJson,
-                                           jstring jmemo) {
+                                           jstring jmemo,
+                                           jstring jfee) {
     bool exception = false;
     std::string msgException;
 
     const char *payloadJson = env->GetStringUTFChars(jpayloadJson, NULL);
     const char *memo = env->GetStringUTFChars(jmemo, NULL);
+    const char *fee = env->GetStringUTFChars(jfee, NULL);
 
     IIDChainSubWallet *wallet = (IIDChainSubWallet *) instance;
     jstring tx = NULL;
 
     try {
         nlohmann::json txJson = wallet->CreateIDTransaction(nlohmann::json::parse(payloadJson),
-                                                            memo);
+                                                            memo, fee);
         tx = env->NewStringUTF(txJson.dump().c_str());
     } catch (const std::exception &e) {
         exception = true;
@@ -33,6 +35,7 @@ static jstring JNICALL CreateIDTransaction(JNIEnv *env, jobject clazz, jlong ins
 
     env->ReleaseStringUTFChars(jpayloadJson, payloadJson);
     env->ReleaseStringUTFChars(jmemo, memo);
+    env->ReleaseStringUTFChars(jfee, fee);
 
     if (exception) {
         ThrowWalletException(env, msgException.c_str());

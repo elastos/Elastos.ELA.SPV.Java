@@ -10,8 +10,8 @@ package org.elastos.spvcore;
 public class IDChainSubWallet extends SidechainSubWallet {
     private long mInstance;
 
-    public String CreateIDTransaction(String payloadJson, String memo) throws WalletException {
-        return CreateIDTransaction(mInstance, payloadJson, memo);
+    public String CreateIDTransaction(String payloadJson, String memo, String fee) throws WalletException {
+        return CreateIDTransaction(mInstance, payloadJson, memo, fee);
     }
 
     public String GetAllDID(int start, int count) throws WalletException {
@@ -47,7 +47,7 @@ public class IDChainSubWallet extends SidechainSubWallet {
         mInstance = instance;
     }
 
-    private native String CreateIDTransaction(long instance, String payloadJSON, String memo);
+    private native String CreateIDTransaction(long instance, String payloadJSON, String memo, String fee);
 
     private native String GetAllDID(long instance, int start, int count);
 
