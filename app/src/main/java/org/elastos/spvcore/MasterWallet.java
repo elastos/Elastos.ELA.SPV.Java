@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2019 The Elastos Open Source Project
+// Copyright (c) 2021 The Elastos Open Source Project
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -13,9 +13,11 @@ import java.util.ArrayList;
  */
 public class MasterWallet {
     static public class CHAINID {
-        public static final String MAIN = "ELA";
-        public static final String ID   = "IDChain";
-        public static final String ETH  = "ETHSC";
+        public static final String MAIN     = "ELA";
+        public static final String ID       = "IDChain";
+        public static final String ETHSC    = "ETHSC";
+        public static final String ETHDID   = "ETHDID";
+        public static final String ETHHECO  = "ETHHECO";
     }
 
     static public String TAG = "IMasterWallet";
@@ -69,8 +71,15 @@ public class MasterWallet {
     }
 
     public SubWallet CreateSubWallet(String chainID) throws WalletException {
-        if ((!CHAINID.MAIN.equals(chainID)) && (!CHAINID.ID.equals(chainID)) && (!CHAINID.ETH.equals(chainID))) {
-            throw new WalletException("Not support the other sidechain now.");
+        switch (chainID) {
+        case CHAINID.MAIN:
+        case CHAINID.ID:
+        case CHAINID.ETHSC:
+        case CHAINID.ETHDID:
+        case CHAINID.ETHHECO:
+            break;
+        default:
+            throw new WalletException("Not support " + chainID + " now.");
         }
 
         for (int i = 0; i < mSubWallets.size(); ++i) {
@@ -94,7 +103,9 @@ public class MasterWallet {
             case CHAINID.ID:
                 subWallet = new IDChainSubWallet(subProxy);
                 break;
-            case CHAINID.ETH:
+            case CHAINID.ETHSC:
+            case CHAINID.ETHDID:
+            case CHAINID.ETHHECO:
                 subWallet = new EthSidechainSubWallet(subProxy);
                 break;
             default:
@@ -113,7 +124,6 @@ public class MasterWallet {
                 break;
             }
         }
-        wallet.RemoveCallback();
         DestroyWallet(mInstance, wallet.GetChainID());
     }
 

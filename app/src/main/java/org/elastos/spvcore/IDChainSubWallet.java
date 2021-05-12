@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2019 The Elastos Open Source Project
+// Copyright (c) 2021 The Elastos Open Source Project
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,8 +10,8 @@ package org.elastos.spvcore;
 public class IDChainSubWallet extends SidechainSubWallet {
     private long mInstance;
 
-    public String CreateIDTransaction(String payloadJson, String memo, String fee) throws WalletException {
-        return CreateIDTransaction(mInstance, payloadJson, memo, fee);
+    public String CreateIDTransaction(String inputs, String payloadJson, String memo, String fee) throws WalletException {
+        return CreateIDTransaction(mInstance, inputs, payloadJson, memo, fee);
     }
 
     public String GetAllDID(int start, int count) throws WalletException {
@@ -47,7 +47,7 @@ public class IDChainSubWallet extends SidechainSubWallet {
         mInstance = instance;
     }
 
-    private native String CreateIDTransaction(long instance, String payloadJSON, String memo, String fee);
+    private native String CreateIDTransaction(long instance, String inputs, String payloadJSON, String memo, String fee);
 
     private native String GetAllDID(long instance, int start, int count);
 

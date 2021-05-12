@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2018 The Elastos Open Source Project
+// Copyright (c) 2021 The Elastos Open Source Project
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,15 +8,17 @@
 
 using namespace Elastos::ElaWallet;
 
-#define JNI_CreateIDTransaction "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+#define JNI_CreateIDTransaction "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
 
 static jstring JNICALL CreateIDTransaction(JNIEnv *env, jobject clazz, jlong instance,
+                                           jstring jinputs,
                                            jstring jpayloadJson,
                                            jstring jmemo,
                                            jstring jfee) {
     bool exception = false;
     std::string msgException;
 
+    const char *inputs = env->GetStringUTFChars(jinputs, NULL);
     const char *payloadJson = env->GetStringUTFChars(jpayloadJson, NULL);
     const char *memo = env->GetStringUTFChars(jmemo, NULL);
     const char *fee = env->GetStringUTFChars(jfee, NULL);
@@ -25,7 +27,8 @@ static jstring JNICALL CreateIDTransaction(JNIEnv *env, jobject clazz, jlong ins
     jstring tx = NULL;
 
     try {
-        nlohmann::json txJson = wallet->CreateIDTransaction(nlohmann::json::parse(payloadJson),
+        nlohmann::json txJson = wallet->CreateIDTransaction(nlohmann::json::parse(inputs),
+                                                            nlohmann::json::parse(payloadJson),
                                                             memo, fee);
         tx = env->NewStringUTF(txJson.dump().c_str());
     } catch (const std::exception &e) {
@@ -33,6 +36,7 @@ static jstring JNICALL CreateIDTransaction(JNIEnv *env, jobject clazz, jlong ins
         msgException = e.what();
     }
 
+    env->ReleaseStringUTFChars(jinputs, inputs);
     env->ReleaseStringUTFChars(jpayloadJson, payloadJson);
     env->ReleaseStringUTFChars(jmemo, memo);
     env->ReleaseStringUTFChars(jfee, fee);
@@ -150,7 +154,7 @@ static jboolean JNICALL VerifySignature(JNIEnv *env, jobject clazz, jlong instan
 #define JNI_GetPublicKeyDID "(JLjava/lang/String;)Ljava/lang/String;"
 
 static jstring JNICALL GetPublicKeyDID(JNIEnv *env, jobject clazz, jlong instance,
-                                         jstring jpublicKey) {
+                                      jstring jpublicKey) {
     bool exception = false;
     std::string msgException;
     jstring jdid = NULL;
@@ -206,9 +210,9 @@ static jstring JNICALL GetPublicKeyCID(JNIEnv *env, jobject clazz, jlong instanc
 #define JNI_SignDigest "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
 
 static jstring JNICALL SignDigest(JNIEnv *env, jobject clazz, jlong instance,
-                                    jstring jdid,
-                                    jstring jdigest,
-                                    jstring jpayPasswd) {
+                                  jstring jdid,
+                                  jstring jdigest,
+                                  jstring jpayPasswd) {
     bool exception = false;
     std::string msgException;
     jstring signature = NULL;

@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2018 The Elastos Open Source Project
+// Copyright (c) 2021 The Elastos Open Source Project
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -21,10 +21,6 @@ extern jint RegisterSidechainSubWallet(JNIEnv *env, const std::string &path);
 
 extern jint RegisterIDChainSubWallet(JNIEnv *env, const std::string &path);
 
-extern jint RegisterSubWalletCallback(JNIEnv *env, const std::string &path);
-
-extern jint RegisterTokenChainSubWallet(JNIEnv *env, const std::string &path);
-
 extern jint RegisterEthSidechainSubWallet(JNIEnv *env, const std::string &path);
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
@@ -39,8 +35,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     RegisterMainchainSubWallet(env, CLASS_PACKAGE_PATH);
     RegisterSidechainSubWallet(env, CLASS_PACKAGE_PATH);
     RegisterIDChainSubWallet(env, CLASS_PACKAGE_PATH);
-    RegisterSubWalletCallback(env, CLASS_PACKAGE_PATH);
-    RegisterTokenChainSubWallet(env, CLASS_PACKAGE_PATH);
     RegisterEthSidechainSubWallet(env, CLASS_PACKAGE_PATH);
 
     return JNI_VERSION_1_6;
