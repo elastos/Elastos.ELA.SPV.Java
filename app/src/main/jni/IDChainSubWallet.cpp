@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "Utils.h"
-#include "IIDChainSubWallet.h"
+#include "IIdChainSubWallet.h"
 #include "nlohmann/json.hpp"
 
 using namespace Elastos::ElaWallet;

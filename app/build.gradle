@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
+apply from: rootProject.file('./gradle-mvn-push.gradle')
 
 android {
     compileSdkVersion 28
@@ -50,18 +50,5 @@ android {
 
 dependencies {
     api 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
-
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-}
-
-
-
-publish {
-    userOrg = 'trinity-tech'
-    groupId = 'org.elastos'
-    artifactId = 'spvcore'
-    publishVersion = '0.6.0.0'
-    desc = 'Elastos Wallet SDK'
-    repoName = 'Elastos.ELA.SPV.Java'
-    website = 'https://gitlab.com/elastos/Elastos.ELA.SPV.Java'
 }
