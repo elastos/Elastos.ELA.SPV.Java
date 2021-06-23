@@ -95,7 +95,6 @@ public class MasterWallet {
         }
 
         SubWallet subWallet = null;
-
         switch (chainID){
             case CHAINID.MAIN:
                 subWallet = new MainchainSubWallet(subProxy);

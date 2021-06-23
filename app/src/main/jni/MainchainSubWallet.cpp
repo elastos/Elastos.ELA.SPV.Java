@@ -335,6 +335,52 @@ static jstring JNICALL GetOwnerAddress(JNIEnv *env, jobject clazz, jlong jSubWal
     return ownerAddress;
 }
 
+#define JNI_GetOwnerDepositAddress "(J)Ljava/lang/String;"
+
+static jstring JNICALL GetOwnerDepositAddress(JNIEnv *env, jobject clazz, jlong jSubWalletProxy) {
+    bool exception = false;
+    std::string msgException;
+    jstring ownerDepositAddress = NULL;
+
+    try {
+        IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+        std::string address = subWallet->GetOwnerDepositAddress();
+        ownerDepositAddress = env->NewStringUTF(address.c_str());
+
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+    return ownerDepositAddress;
+}
+
+#define JNI_GetCRDepositAddress "(J)Ljava/lang/String;"
+
+static jstring JNICALL GetCRDepositAddress(JNIEnv *env, jobject clazz, jlong jSubWalletProxy) {
+    bool exception = false;
+    std::string msgException;
+    jstring crDepositAddress = NULL;
+
+    try {
+        IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+        std::string address = subWallet->GetCRDepositAddress();
+        crDepositAddress = env->NewStringUTF(address.c_str());
+
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+    return crDepositAddress;
+}
+
 #define JNI_GenerateCRInfoPayload "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;J)Ljava/lang/String;"
 
 static jstring JNICALL GenerateCRInfoPayload(JNIEnv *env, jobject clazz, jlong jProxy,
@@ -1381,6 +1427,8 @@ static const JNINativeMethod methods[] = {
         REGISTER_METHOD(CreateRetrieveDepositTransaction),
         REGISTER_METHOD(GetOwnerPublicKey),
         REGISTER_METHOD(GetOwnerAddress),
+        REGISTER_METHOD(GetOwnerDepositAddress),
+        REGISTER_METHOD(GetCRDepositAddress),
         REGISTER_METHOD(GenerateCRInfoPayload),
         REGISTER_METHOD(GenerateUnregisterCRPayload),
         REGISTER_METHOD(CreateRegisterCRTransaction),
