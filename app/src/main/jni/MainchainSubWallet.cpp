@@ -255,10 +255,11 @@ static jstring JNICALL CreateCancelProducerTransaction(JNIEnv *env, jobject claz
     return tx;
 }
 
-#define JNI_CreateRetrieveDepositTransaction "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+#define JNI_CreateRetrieveDepositTransaction "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
 
 static jstring JNICALL CreateRetrieveDepositTransaction(JNIEnv *env, jobject clazz, jlong jProxy,
                                                         jstring jInputs,
+                                                        jstring jAmount,
                                                         jstring jFee,
                                                         jstring jMemo) {
     bool exception = false;
@@ -267,11 +268,12 @@ static jstring JNICALL CreateRetrieveDepositTransaction(JNIEnv *env, jobject cla
 
     const char *inputs = env->GetStringUTFChars(jInputs, NULL);
     const char *fee = env->GetStringUTFChars(jFee, NULL);
+    const char *amount = env->GetStringUTFChars(jAmount, NULL);
     const char *memo = env->GetStringUTFChars(jMemo, NULL);
 
     try {
         IMainchainSubWallet *wallet = (IMainchainSubWallet *) jProxy;
-        nlohmann::json txJson = wallet->CreateRetrieveDepositTransaction(nlohmann::json::parse(inputs), fee, memo);
+        nlohmann::json txJson = wallet->CreateRetrieveDepositTransaction(nlohmann::json::parse(inputs), amount, fee, memo);
         tx = env->NewStringUTF(txJson.dump().c_str());
     } catch (const std::exception &e) {
         exception = true;
@@ -279,6 +281,7 @@ static jstring JNICALL CreateRetrieveDepositTransaction(JNIEnv *env, jobject cla
     }
 
     env->ReleaseStringUTFChars(jInputs, inputs);
+    env->ReleaseStringUTFChars(jAmount, amount);
     env->ReleaseStringUTFChars(jFee, fee);
     env->ReleaseStringUTFChars(jMemo, memo);
 
@@ -570,16 +573,18 @@ static jstring JNICALL CreateUnregisterCRTransaction(JNIEnv *env, jobject clazz,
     return tx;
 }
 
-#define JNI_CreateRetrieveCRDepositTransaction "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+#define JNI_CreateRetrieveCRDepositTransaction "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
 
 static jstring JNICALL CreateRetrieveCRDepositTransaction(JNIEnv *env, jobject clazz, jlong jProxy,
                                                           jstring jInputs,
+                                                          jstring jAmount,
                                                           jstring jFee,
                                                           jstring jmemo) {
     bool exception = false;
     std::string msgException;
 
     const char *inputs = env->GetStringUTFChars(jInputs, NULL);
+    const char *amount = env->GetStringUTFChars(jAmount, NULL);
     const char *fee = env->GetStringUTFChars(jFee, NULL);
     const char *memo = env->GetStringUTFChars(jmemo, NULL);
 
@@ -587,7 +592,7 @@ static jstring JNICALL CreateRetrieveCRDepositTransaction(JNIEnv *env, jobject c
 
     try {
         IMainchainSubWallet *wallet = (IMainchainSubWallet *) jProxy;
-        nlohmann::json txJson = wallet->CreateRetrieveCRDepositTransaction(nlohmann::json::parse(inputs), fee, memo);
+        nlohmann::json txJson = wallet->CreateRetrieveCRDepositTransaction(nlohmann::json::parse(inputs), amount, fee, memo);
         tx = env->NewStringUTF(txJson.dump().c_str());
     } catch (const std::exception &e) {
         exception = true;
@@ -595,6 +600,7 @@ static jstring JNICALL CreateRetrieveCRDepositTransaction(JNIEnv *env, jobject c
     }
 
     env->ReleaseStringUTFChars(jInputs, inputs);
+    env->ReleaseStringUTFChars(jAmount, amount);
     env->ReleaseStringUTFChars(jFee, fee);
     env->ReleaseStringUTFChars(jmemo, memo);
 

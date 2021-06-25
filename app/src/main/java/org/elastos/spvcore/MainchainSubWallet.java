@@ -47,8 +47,8 @@ public class MainchainSubWallet extends SubWallet {
         return CreateCancelProducerTransaction(mMainchainProxy, inputs, payloadJson, fee, memo);
     }
 
-    public String CreateRetrieveDepositTransaction(String inputs, String fee, String memo) throws WalletException {
-        return CreateRetrieveDepositTransaction(mMainchainProxy, inputs, fee, memo);
+    public String CreateRetrieveDepositTransaction(String inputs, String amount, String fee, String memo) throws WalletException {
+        return CreateRetrieveDepositTransaction(mMainchainProxy, inputs, amount, fee, memo);
     }
 
     public String GetOwnerPublicKey() throws WalletException {
@@ -88,8 +88,8 @@ public class MainchainSubWallet extends SubWallet {
         return CreateUnregisterCRTransaction(mMainchainProxy, inputs, payload, fee, memo);
     }
 
-    public String CreateRetrieveCRDepositTransaction(String inputs, String fee, String memo) throws WalletException {
-        return CreateRetrieveCRDepositTransaction(mMainchainProxy, inputs, fee, memo);
+    public String CreateRetrieveCRDepositTransaction(String inputs, String amount, String fee, String memo) throws WalletException {
+        return CreateRetrieveCRDepositTransaction(mMainchainProxy, inputs, amount, fee, memo);
     }
 
     public String CRCouncilMemberClaimNodeDigest(String payload) throws WalletException {
@@ -186,7 +186,7 @@ public class MainchainSubWallet extends SubWallet {
                                                             String fee, String memo);
     private native String CreateUpdateProducerTransaction(long proxy, String inputs, String payloadJson, String fee, String memo);
     private native String CreateCancelProducerTransaction(long proxy, String inputs, String payloadJson, String fee, String memo);
-    private native String CreateRetrieveDepositTransaction(long proxy, String inputs, String fee, String memo);
+    private native String CreateRetrieveDepositTransaction(long proxy, String inputs, String amount, String fee, String memo);
     private native String GetOwnerPublicKey(long proxy);
     private native String GetOwnerAddress(long proxy);
     private native String GetOwnerDepositAddress(long proxy);
@@ -196,7 +196,7 @@ public class MainchainSubWallet extends SubWallet {
     private native String CreateRegisterCRTransaction(long proxy, String inputs, String payload, String amount, String fee, String memo);
     private native String CreateUpdateCRTransaction(long proxy, String inputs, String payload, String fee, String memo);
     private native String CreateUnregisterCRTransaction(long proxy, String inputs, String payload, String fee, String memo);
-    private native String CreateRetrieveCRDepositTransaction(long Proxy, String inputs, String fee, String memo);
+    private native String CreateRetrieveCRDepositTransaction(long Proxy, String inputs, String amount, String fee, String memo);
     private native String CRCouncilMemberClaimNodeDigest(long Proxy, String payload);
     private native String CreateCRCouncilMemberClaimNodeTransaction(long Proxy, String inputs, String payload, String fee, String memo);
     private native String ProposalOwnerDigest(long Proxy, String payload);
