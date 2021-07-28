@@ -33,10 +33,11 @@ public class MasterWalletManager {
     public MasterWalletManager(String rootPath, String netType, String config, String dataPath) throws WalletException {
         mRootPath = rootPath;
         mInstance = InitMasterWalletManager(mRootPath, netType, config, dataPath);
+        Log.i(TAG, "New MasterWalletManager netType:" + netType + " config:" + config + " mInstance:" + mInstance);
     }
 
     public void Dispose() {
-        Log.i(TAG, "Dispose");
+        Log.i(TAG, "Dispose " + mInstance);
         DisposeNative(mInstance);
     }
 

@@ -76,9 +76,38 @@ static jstring JNICALL CreateTransferGeneric(JNIEnv *env, jobject clazz, jlong i
     return tx;
 }
 
+#define JNI_ExportPrivateKey "(JLjava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL ExportPrivateKey(JNIEnv *env, jobject clazz, jlong instance,
+                                      jstring jpaypassword) {
+    bool exception = false;
+    std::string msgException;
+    jstring result = NULL;
+
+    const char *password = env->GetStringUTFChars(jpaypassword, NULL);
+
+    try {
+        IEthSidechainSubWallet *wallet = (IEthSidechainSubWallet *) instance;
+        std::string privateKey = wallet->ExportPrivateKey(password);
+        result = env->NewStringUTF(privateKey.c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jpaypassword, password);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return result;
+}
+
 static const JNINativeMethod methods[] = {
     REGISTER_METHOD(CreateTransfer),
     REGISTER_METHOD(CreateTransferGeneric),
+    REGISTER_METHOD(ExportPrivateKey),
 };
 
 jint RegisterEthSidechainSubWallet(JNIEnv *env, const std::string &path) {
