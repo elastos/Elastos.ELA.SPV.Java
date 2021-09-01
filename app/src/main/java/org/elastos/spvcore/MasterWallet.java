@@ -15,9 +15,6 @@ public class MasterWallet {
     static public class CHAINID {
         public static final String MAIN     = "ELA";
         public static final String ID       = "IDChain";
-        public static final String ETHSC    = "ETHSC";
-        public static final String ETHDID   = "ETHDID";
-        public static final String ETHHECO  = "ETHHECO";
     }
 
     static public String TAG = "IMasterWallet";
@@ -74,12 +71,12 @@ public class MasterWallet {
         switch (chainID) {
         case CHAINID.MAIN:
         case CHAINID.ID:
-        case CHAINID.ETHSC:
-        case CHAINID.ETHDID:
-        case CHAINID.ETHHECO:
             break;
         default:
-            throw new WalletException("Not support " + chainID + " now.");
+            if (!chainID.startsWith("ETH")) {
+              throw new WalletException("Not support " + chainID + " now.");
+            }
+            break;
         }
 
         for (int i = 0; i < mSubWallets.size(); ++i) {
@@ -102,13 +99,13 @@ public class MasterWallet {
             case CHAINID.ID:
                 subWallet = new IDChainSubWallet(subProxy);
                 break;
-            case CHAINID.ETHSC:
-            case CHAINID.ETHDID:
-            case CHAINID.ETHHECO:
-                subWallet = new EthSidechainSubWallet(subProxy);
-                break;
             default:
-                throw new WalletException("Unsupport chainID: " + chainID);
+                if (chainID.startsWith("ETH")) {
+                    subWallet = new EthSidechainSubWallet(subProxy);
+                } else {
+                    throw new WalletException("Unsupport chainID: " + chainID);
+                }
+                break;
         }
 
         mSubWallets.add(subWallet);
