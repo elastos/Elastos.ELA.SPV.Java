@@ -8,20 +8,23 @@
 
 using namespace Elastos::ElaWallet;
 
-#define JNI_CreateTransfer "(JLjava/lang/String;Ljava/lang/String;IJ)Ljava/lang/String;"
+#define JNI_CreateTransfer "(JLjava/lang/String;Ljava/lang/String;ILjava/lang/String;ILjava/lang/String;J)Ljava/lang/String;"
 
 static jstring JNICALL CreateTransfer(JNIEnv *env, jobject clazz, jlong instance,
-                                        jstring jtargetAddress, jstring jamount, jint amountUnit, jlong nonce) {
+                                        jstring jtargetAddress, jstring jamount, jint amountUnit,
+                                        jstring jgasPrice, jint gasPriceUnit, jstring jgasLimit, jlong nonce) {
     bool exception = false;
     std::string msgException;
 
     IEthSidechainSubWallet *wallet = (IEthSidechainSubWallet *) instance;
     const char *targetAddress = env->GetStringUTFChars(jtargetAddress, NULL);
     const char *amount = env->GetStringUTFChars(jamount, NULL);
+    const char *gasPrice = env->GetStringUTFChars(jgasPrice, NULL);
+    const char *gasLimit = env->GetStringUTFChars(jgasLimit, NULL);
     jstring tx = NULL;
 
     try {
-        nlohmann::json txJson = wallet->CreateTransfer(targetAddress, amount, amountUnit, nonce);
+        nlohmann::json txJson = wallet->CreateTransfer(targetAddress, amount, amountUnit, gasPrice, gasPriceUnit, gasLimit, nonce);
         tx = env->NewStringUTF(txJson.dump().c_str());
     } catch (const std::exception &e) {
         exception = true;
@@ -30,6 +33,8 @@ static jstring JNICALL CreateTransfer(JNIEnv *env, jobject clazz, jlong instance
 
     env->ReleaseStringUTFChars(jtargetAddress, targetAddress);
     env->ReleaseStringUTFChars(jamount, amount);
+    env->ReleaseStringUTFChars(jgasPrice, gasPrice);
+    env->ReleaseStringUTFChars(jgasLimit, gasLimit);
 
     if (exception) {
         ThrowWalletException(env, msgException.c_str());

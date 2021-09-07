@@ -11,8 +11,9 @@ package org.elastos.spvcore;
 public class EthSidechainSubWallet extends SubWallet {
     private long mInstance;
 
-    public String CreateTransfer(String targetAddress, String amount, int amountUnit, long nonce) throws WalletException {
-        return CreateTransfer(mInstance, targetAddress, amount, amountUnit, nonce);
+    public String CreateTransfer(String targetAddress, String amount, int amountUnit,
+            String gasPrice, int gasPriceUnit, String gasLimit, long nonce) throws WalletException {
+        return CreateTransfer(mInstance, targetAddress, amount, amountUnit, gasPrice, gasPriceUnit, gasLimit, nonce);
     }
 
     public String CreateTransferGeneric(String targetAddress, String amount, int amountUnit,
@@ -29,10 +30,11 @@ public class EthSidechainSubWallet extends SubWallet {
         mInstance = instance;
     }
 
-    private native String CreateTransfer(long instance, String targetAddress, String amount, int amountUnit, long nonce);
+    private native String CreateTransfer(long instance, String targetAddress, String amount, int amountUnit,
+            String gasPrice, int gasPriceUnit, String gasLimit, long nonce);
 
     private native String CreateTransferGeneric(long instance, String targetAddress, String amount, int amountUnit,
-                                                String gasPrice, int gasPriceUnit, String gasLimit, String data, long nonce);
+            String gasPrice, int gasPriceUnit, String gasLimit, String data, long nonce);
 
     private native String ExportPrivateKey(long instance, String paypassword);
 }
