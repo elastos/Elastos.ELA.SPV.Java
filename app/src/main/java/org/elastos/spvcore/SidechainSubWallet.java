@@ -7,7 +7,7 @@ package org.elastos.spvcore;
 /**
  * ISidechainSubWallet jni
  */
-public class SidechainSubWallet extends SubWallet {
+public class SidechainSubWallet extends ElastosBaseSubWallet {
     private long mInstance;
 
     public String CreateWithdrawTransaction(String inputs, String amount, String mainChainAddress, String fee, String memo) throws WalletException {

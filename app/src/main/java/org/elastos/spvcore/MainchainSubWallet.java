@@ -7,7 +7,7 @@ package org.elastos.spvcore;
 /**
  * MainchainSubWallet jni
  */
-public class MainchainSubWallet extends SubWallet {
+public class MainchainSubWallet extends ElastosBaseSubWallet {
     private long mMainchainProxy;
 
     public MainchainSubWallet(long proxy) {
@@ -15,8 +15,8 @@ public class MainchainSubWallet extends SubWallet {
         mMainchainProxy = proxy;
     }
 
-    public String CreateDepositTransaction(String inputs, String sideChainID, String amount, String sideChainAddress, String lockAddress, String fee, String memo) throws WalletException {
-        return CreateDepositTransaction(mMainchainProxy, inputs, sideChainID, amount, sideChainAddress, lockAddress, fee, memo);
+    public String CreateDepositTransaction(int version, String inputs, String sideChainID, String amount, String sideChainAddress, String lockAddress, String fee, String memo) throws WalletException {
+        return CreateDepositTransaction(mMainchainProxy, version, inputs, sideChainID, amount, sideChainAddress, lockAddress, fee, memo);
     }
 
     public String GetDepositAddress(String pubkey) throws WalletException {
@@ -175,7 +175,7 @@ public class MainchainSubWallet extends SubWallet {
         return CreateProposalWithdrawTransaction(mMainchainProxy, inputs, payload, fee, memo);
     }
 
-    private native String CreateDepositTransaction(long proxy, String inputs, String sideChainID, String amount,
+    private native String CreateDepositTransaction(long proxy, int version, String inputs, String sideChainID, String amount,
                                                    String sideChainAddress, String lockAddress, String fee, String memo);
     private native String GetDepositAddress(long Proxy, String pubkey);
     private native String CreateVoteTransaction(long Proxy, String inputs, String voteContents, String fee, String memo);

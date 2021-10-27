@@ -14,12 +14,12 @@ public class IDChainSubWallet extends SidechainSubWallet {
         return CreateIDTransaction(mInstance, inputs, payloadJson, memo, fee);
     }
 
-    public String GetAllDID(int start, int count) throws WalletException {
-        return GetAllDID(mInstance, start, count);
+    public String GetDID(int start, int count, boolean internal) throws WalletException {
+        return GetDID(mInstance, start, count, internal);
     }
 
-    public String GetAllCID(int start, int count) throws WalletException {
-        return GetAllCID(mInstance, start, count);
+    public String GetCID(int start, int count, boolean internal) throws WalletException {
+        return GetCID(mInstance, start, count, internal);
     }
 
     public String Sign(String did, String message, String payPassword) throws WalletException {
@@ -49,9 +49,9 @@ public class IDChainSubWallet extends SidechainSubWallet {
 
     private native String CreateIDTransaction(long instance, String inputs, String payloadJSON, String memo, String fee);
 
-    private native String GetAllDID(long instance, int start, int count);
+    private native String GetDID(long instance, int start, int count, boolean internal);
 
-    private native String GetAllCID(long instance, int start, int count);
+    private native String GetCID(long instance, int start, int count, boolean internal);
 
     private native String Sign(long instance, String did, String message, String payPassword);
 

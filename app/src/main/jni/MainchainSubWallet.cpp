@@ -8,9 +8,10 @@
 
 using namespace Elastos::ElaWallet;
 
-#define JNI_CreateDepositTransaction "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+#define JNI_CreateDepositTransaction "(JILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
 
 static jstring JNICALL CreateDepositTransaction(JNIEnv *env, jobject clazz, jlong instance,
+                                                jint jversion,
                                                 jstring jInputs,
                                                 jstring jsideChainID,
                                                 jstring jamount,
@@ -33,7 +34,7 @@ static jstring JNICALL CreateDepositTransaction(JNIEnv *env, jobject clazz, jlon
     jstring tx = NULL;
 
     try {
-        nlohmann::json txJson = wallet->CreateDepositTransaction(nlohmann::json::parse(inputs),
+        nlohmann::json txJson = wallet->CreateDepositTransaction(jversion, nlohmann::json::parse(inputs),
                                                                   sideChainID, amount,
                                                                   sideChainAddress, lockAddress,
                                                                   fee, memo);
