@@ -48,16 +48,15 @@ static jstring JNICALL CreateIDTransaction(JNIEnv *env, jobject clazz, jlong ins
     return tx;
 }
 
-#define JNI_GetAllDID "(JII)Ljava/lang/String;"
+#define JNI_GetDID "(JIIZ)Ljava/lang/String;"
 
-static jstring JNICALL GetAllDID(JNIEnv *env, jobject clazz, jlong instance,
-                                 jint jStart,
-                                 jint jCount) {
+static jstring JNICALL GetDID(JNIEnv *env, jobject clazz, jlong instance,
+                                 jint jStart, jint jCount, jboolean jInternal) {
     jstring didString = NULL;
 
     try {
         IIDChainSubWallet *wallet = (IIDChainSubWallet *) instance;
-        nlohmann::json didJson = wallet->GetAllDID(jStart, jCount);
+        nlohmann::json didJson = wallet->GetDID(jStart, jCount, jInternal);
         didString = env->NewStringUTF(didJson.dump().c_str());
     } catch (const std::exception &e) {
         ThrowWalletException(env, e.what());
@@ -66,16 +65,16 @@ static jstring JNICALL GetAllDID(JNIEnv *env, jobject clazz, jlong instance,
     return didString;
 }
 
-#define JNI_GetAllCID "(JII)Ljava/lang/String;"
+#define JNI_GetCID "(JIIZ)Ljava/lang/String;"
 
-static jstring JNICALL GetAllCID(JNIEnv *env, jobject clazz, jlong instance,
+static jstring JNICALL GetCID(JNIEnv *env, jobject clazz, jlong instance,
                                  jint jStart,
-                                 jint jCount) {
+                                 jint jCount, jboolean jInternal) {
     jstring cidString = NULL;
 
     try {
         IIDChainSubWallet *wallet = (IIDChainSubWallet *) instance;
-        nlohmann::json didJson = wallet->GetAllCID(jStart, jCount);
+        nlohmann::json didJson = wallet->GetCID(jStart, jCount, jInternal);
         cidString = env->NewStringUTF(didJson.dump().c_str());
     } catch (const std::exception &e) {
         ThrowWalletException(env, e.what());
@@ -242,8 +241,8 @@ static jstring JNICALL SignDigest(JNIEnv *env, jobject clazz, jlong instance,
 
 static const JNINativeMethod methods[] = {
         REGISTER_METHOD(CreateIDTransaction),
-        REGISTER_METHOD(GetAllDID),
-        REGISTER_METHOD(GetAllCID),
+        REGISTER_METHOD(GetDID),
+        REGISTER_METHOD(GetCID),
         REGISTER_METHOD(Sign),
         REGISTER_METHOD(VerifySignature),
         REGISTER_METHOD(GetPublicKeyDID),
