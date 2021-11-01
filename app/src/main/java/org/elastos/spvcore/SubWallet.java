@@ -33,6 +33,14 @@ public class SubWallet {
         return SignTransaction(mInstance, rawTransaction, payPassword);
     }
 
+    public String SignDigest(String address, String digest, String payPassword) throws WalletException {
+        return SignDigest(mInstance, address, digest, payPassword);
+    }
+
+    public boolean VerifyDigest(String publicKey, String digest, String signature) throws WalletException {
+        return VerifyDigest(mInstance, publicKey, digest, signature);
+    }
+
     public String Sign(String message, String payPassword) throws WalletException {
         return Sign(mInstance, message, payPassword);
     }
@@ -63,6 +71,10 @@ public class SubWallet {
     private native String GetPublicKeys(long subProxy, int start, int count, boolean internal);
 
     private native String SignTransaction(long subProxy, String rawTransaction, String payPassword);
+
+    private native String SignDigest(long instance, String address, String digest, String payPassword);
+
+    private native boolean VerifyDigest(long instance, String publicKey, String digest, String signature);
 
     private native String Sign(long subProxy, String message, String payPassword);
 
