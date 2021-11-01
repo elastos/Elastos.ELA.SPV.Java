@@ -38,10 +38,6 @@ public class IDChainSubWallet extends SidechainSubWallet {
         return GetPublicKeyCID(mInstance, publicKey);
     }
 
-    public String SignDigest(String did, String digest, String payPassword) throws WalletException {
-        return SignDigest(mInstance, did, digest, payPassword);
-    }
-
     public IDChainSubWallet(long instance) {
         super(instance);
         mInstance = instance;
@@ -60,6 +56,4 @@ public class IDChainSubWallet extends SidechainSubWallet {
     private native String GetPublicKeyDID(long instance, String publicKey);
 
     private native String GetPublicKeyCID(long instance, String publicKey);
-
-    private native String SignDigest(long instance, String did, String digest, String payPassword);
 }

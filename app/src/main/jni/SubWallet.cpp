@@ -110,12 +110,80 @@ static jstring JNICALL SignTransaction(JNIEnv *env, jobject clazz, jlong jSubPro
     return tx;
 }
 
+
+#define JNI_SignDigest "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL SignDigest(JNIEnv *env, jobject clazz, jlong instance,
+                                  jstring jaddress,
+                                  jstring jdigest,
+                                  jstring jpayPasswd) {
+    bool exception = false;
+    std::string msgException;
+    jstring signature = NULL;
+
+    const char *address = env->GetStringUTFChars(jaddress, NULL);
+    const char *digest = env->GetStringUTFChars(jdigest, NULL);
+    const char *payPasswd = env->GetStringUTFChars(jpayPasswd, NULL);
+
+    try {
+        ISubWallet *wallet = (ISubWallet *) instance;
+        std::string sig = wallet->SignDigest(address, digest, payPasswd);
+        signature = env->NewStringUTF(sig.c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jaddress, address);
+    env->ReleaseStringUTFChars(jdigest, digest);
+    env->ReleaseStringUTFChars(jpayPasswd, payPasswd);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+    return signature;
+}
+
+#define JNI_VerifyDigest "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z"
+
+static jboolean JNICALL VerifyDigest(JNIEnv *env, jobject clazz, jlong instance,
+                                  jstring jpublicKey,
+                                  jstring jdigest,
+                                  jstring jsignature) {
+    bool exception = false;
+    std::string msgException;
+    bool valid = false;
+
+    const char *publicKey = env->GetStringUTFChars(jpublicKey, NULL);
+    const char *digest = env->GetStringUTFChars(jdigest, NULL);
+    const char *signature = env->GetStringUTFChars(jsignature, NULL);
+
+    try {
+        ISubWallet *wallet = (ISubWallet *) instance;
+        valid = wallet->VerifyDigest(publicKey, digest, signature);
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jpublicKey, publicKey);
+    env->ReleaseStringUTFChars(jdigest, digest);
+    env->ReleaseStringUTFChars(jsignature, signature);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+    return (jboolean) valid;
+}
+
 static const JNINativeMethod methods[] = {
         REGISTER_METHOD(GetChainID),
         REGISTER_METHOD(GetBasicInfo),
         REGISTER_METHOD(GetAddresses),
         REGISTER_METHOD(GetPublicKeys),
         REGISTER_METHOD(SignTransaction),
+        REGISTER_METHOD(SignDigest),
+        REGISTER_METHOD(VerifyDigest),
 };
 
 jint RegisterSubWallet(JNIEnv *env, const std::string &path) {

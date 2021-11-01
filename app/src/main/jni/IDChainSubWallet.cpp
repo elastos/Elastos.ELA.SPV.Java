@@ -206,39 +206,6 @@ static jstring JNICALL GetPublicKeyCID(JNIEnv *env, jobject clazz, jlong instanc
     return jcid;
 }
 
-#define JNI_SignDigest "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
-
-static jstring JNICALL SignDigest(JNIEnv *env, jobject clazz, jlong instance,
-                                  jstring jdid,
-                                  jstring jdigest,
-                                  jstring jpayPasswd) {
-    bool exception = false;
-    std::string msgException;
-    jstring signature = NULL;
-
-    const char *did = env->GetStringUTFChars(jdid, NULL);
-    const char *digest = env->GetStringUTFChars(jdigest, NULL);
-    const char *payPasswd = env->GetStringUTFChars(jpayPasswd, NULL);
-
-    try {
-        IIDChainSubWallet *wallet = (IIDChainSubWallet *) instance;
-        std::string sig = wallet->SignDigest(did, digest, payPasswd);
-        signature = env->NewStringUTF(sig.c_str());
-    } catch (const std::exception &e) {
-        exception = true;
-        msgException = e.what();
-    }
-
-    env->ReleaseStringUTFChars(jdid, did);
-    env->ReleaseStringUTFChars(jdigest, digest);
-    env->ReleaseStringUTFChars(jpayPasswd, payPasswd);
-
-    if (exception) {
-        ThrowWalletException(env, msgException.c_str());
-    }
-    return signature;
-}
-
 static const JNINativeMethod methods[] = {
         REGISTER_METHOD(CreateIDTransaction),
         REGISTER_METHOD(GetDID),
@@ -247,7 +214,6 @@ static const JNINativeMethod methods[] = {
         REGISTER_METHOD(VerifySignature),
         REGISTER_METHOD(GetPublicKeyDID),
         REGISTER_METHOD(GetPublicKeyCID),
-        REGISTER_METHOD(SignDigest),
 };
 
 jint RegisterIDChainSubWallet(JNIEnv *env, const std::string &path) {

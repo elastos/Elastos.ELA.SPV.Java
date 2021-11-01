@@ -10,8 +10,10 @@ using namespace Elastos::ElaWallet;
 const std::string CLASS_MCSUBWALLET = CLASS_PACKAGE_PATH + "MainchainSubWallet";
 const std::string CLASS_IDSUBWALLET = CLASS_PACKAGE_PATH + "IDChainSubWallet";
 const std::string CLASS_ETHSUBWALLET = CLASS_PACKAGE_PATH + "EthSidechainSubWallet";
+const std::string CLASS_BTCSUBWALLET = CLASS_PACKAGE_PATH + "BTCSubWallet";
 const std::string CHAINID_MAINCHAIN = "ELA";
 const std::string CHAINID_IDCHAIN   = "IDChain";
+const std::string CHAINID_BTC       = "BTC";
 
 
 #define JNI_GetID "(J)Ljava/lang/String;"
@@ -69,6 +71,12 @@ static jobjectArray JNICALL GetAllSubWallets(JNIEnv *env, jobject clazz, jlong i
                 env->SetObjectArrayElement(subWalletArray, i, subWallet);
             } else if (id == CHAINID_IDCHAIN) {
                 clazzSubWallet = env->FindClass(CLASS_IDSUBWALLET.c_str());
+                subWalletConstructor = env->GetMethodID(clazzSubWallet, "<init>", "(J)V");
+                subWallet = env->NewObject(clazzSubWallet, subWalletConstructor,
+                                           (jlong) allSubWallets[i]);
+                env->SetObjectArrayElement(subWalletArray, i, subWallet);
+            } else if (id == CHAINID_BTC) {
+                clazzSubWallet = env->FindClass(CLASS_BTCSUBWALLET.c_str());
                 subWalletConstructor = env->GetMethodID(clazzSubWallet, "<init>", "(J)V");
                 subWallet = env->NewObject(clazzSubWallet, subWalletConstructor,
                                            (jlong) allSubWallets[i]);
