@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "ISubWallet.h"
+#include "IElastosBaseSubWallet.h"
 
 #ifndef __ELASTOS_SDK_IMAINCHAINSUBWALLET_H__
 #define __ELASTOS_SDK_IMAINCHAINSUBWALLET_H__

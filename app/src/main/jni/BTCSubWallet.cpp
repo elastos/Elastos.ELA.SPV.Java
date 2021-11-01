@@ -18,7 +18,7 @@ static jstring JNICALL GetLegacyAddresses(JNIEnv *env, jobject clazz, jlong jSub
     jstring addresses = NULL;
 
     try {
-        ISubWallet *subWallet = (ISubWallet *) jSubProxy;
+        IBTCSubWallet *subWallet = (IBTCSubWallet *) jSubProxy;
         nlohmann::json addressesJson = subWallet->GetLegacyAddresses(jIndex, jCount, jInternal);
         addresses = env->NewStringUTF(addressesJson.dump().c_str());
     } catch (const std::exception &e) {
@@ -28,8 +28,50 @@ static jstring JNICALL GetLegacyAddresses(JNIEnv *env, jobject clazz, jlong jSub
     return addresses;
 }
 
+
+#define JNI_CreateTransaction "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL CreateTransaction(JNIEnv *env, jobject clazz, jlong jSubProxy,
+                                         jstring jInputs,
+                                         jstring jOutputs,
+                                         jstring jChangeAddress,
+                                         jstring jFeePerKB) {
+    bool exception = false;
+    std::string msgException;
+
+    const char *inputs = env->GetStringUTFChars(jInputs, NULL);
+    const char *outputs = env->GetStringUTFChars(jOutputs, NULL);
+    const char *changeAddress = env->GetStringUTFChars(jChangeAddress, NULL);
+    const char *feePerKB = env->GetStringUTFChars(jFeePerKB, NULL);
+
+    IBTCSubWallet *subWallet = (IBTCSubWallet *) jSubProxy;
+    jstring tx = NULL;
+
+    try {
+        nlohmann::json result = subWallet->CreateTransaction(nlohmann::json::parse(inputs),
+                                                            nlohmann::json::parse(outputs),
+                                                            changeAddress, feePerKB);
+        tx = env->NewStringUTF(result.dump().c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jInputs, inputs);
+    env->ReleaseStringUTFChars(jOutputs, outputs);
+    env->ReleaseStringUTFChars(jChangeAddress, changeAddress);
+    env->ReleaseStringUTFChars(jFeePerKB, feePerKB);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return tx;
+}
+
 static const JNINativeMethod methods[] = {
         REGISTER_METHOD(GetLegacyAddresses),
+        REGISTER_METHOD(CreateTransaction),
 };
 
 jint RegisterBTCSubWallet(JNIEnv *env, const std::string &path) {

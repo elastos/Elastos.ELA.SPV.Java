@@ -23,7 +23,7 @@ extern jint RegisterIDChainSubWallet(JNIEnv *env, const std::string &path);
 
 extern jint RegisterEthSidechainSubWallet(JNIEnv *env, const std::string &path);
 
-extern jint RegisterElastBaseSubWallet(JNIEnv *env, const std::string &path);
+extern jint RegisterElastosBaseSubWallet(JNIEnv *env, const std::string &path);
 
 extern jint RegisterBTCSubWallet(JNIEnv *env, const std::string &path);
 
@@ -36,12 +36,13 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     RegisterMasterWalletManager(env, CLASS_PACKAGE_PATH);
     RegisterMasterWallet(env, CLASS_PACKAGE_PATH);
     RegisterSubWallet(env, CLASS_PACKAGE_PATH);
+    RegisterElastosBaseSubWallet(env, CLASS_PACKAGE_PATH);
     RegisterMainchainSubWallet(env, CLASS_PACKAGE_PATH);
     RegisterSidechainSubWallet(env, CLASS_PACKAGE_PATH);
     RegisterIDChainSubWallet(env, CLASS_PACKAGE_PATH);
     RegisterEthSidechainSubWallet(env, CLASS_PACKAGE_PATH);
-    RegisterElastBaseSubWallet(env, CLASS_PACKAGE_PATH);
     RegisterBTCSubWallet(env, CLASS_PACKAGE_PATH);
+
 
     return JNI_VERSION_1_6;
 }
