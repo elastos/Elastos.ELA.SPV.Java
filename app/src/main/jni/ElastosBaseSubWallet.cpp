@@ -27,7 +27,7 @@ static jstring JNICALL CreateTransaction(JNIEnv *env, jobject clazz, jlong jSubP
     const char *fee = env->GetStringUTFChars(jFee, NULL);
     const char *memo = env->GetStringUTFChars(jmemo, NULL);
 
-    ISubWallet *subWallet = (ISubWallet *) jSubProxy;
+    IElastosBaseSubWallet *subWallet = (IElastosBaseSubWallet *) jSubProxy;
     jstring tx = NULL;
 
     try {
@@ -63,7 +63,7 @@ static jstring JNICALL GetTransactionSignedInfo(JNIEnv *env, jobject clazz, jlon
     jstring result = NULL;
 
     try {
-        ISubWallet *subWallet = (ISubWallet *) jSubProxy;
+        IElastosBaseSubWallet *subWallet = (IElastosBaseSubWallet *) jSubProxy;
         nlohmann::json signers = subWallet->GetTransactionSignedInfo(
                 nlohmann::json::parse(transactionJson));
         result = env->NewStringUTF(signers.dump().c_str());
@@ -92,7 +92,7 @@ static jstring JNICALL ConvertToRawTransaction(JNIEnv *env, jobject clazz, jlong
     jstring result = NULL;
 
     try {
-        ISubWallet *subWallet = (ISubWallet *) jSubProxy;
+        IElastosBaseSubWallet *subWallet = (IElastosBaseSubWallet *) jSubProxy;
         std::string tx = subWallet->ConvertToRawTransaction(nlohmann::json::parse(transactionJson));
         result = env->NewStringUTF(tx.c_str());
     } catch (const std::exception &e) {
@@ -115,6 +115,6 @@ static const JNINativeMethod methods[] = {
         REGISTER_METHOD(ConvertToRawTransaction),
 };
 
-jint RegisterElastBaseSubWallet(JNIEnv *env, const std::string &path) {
+jint RegisterElastosBaseSubWallet(JNIEnv *env, const std::string &path) {
     return RegisterNativeMethods(env, path + "ElastosBaseSubWallet", methods, NELEM(methods));
 }

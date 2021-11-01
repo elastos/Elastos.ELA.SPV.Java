@@ -7,7 +7,7 @@ package org.elastos.spvcore;
 import android.util.Log;
 
 /**
- * SubWallet
+ * BTCSubWallet
  */
 public class BTCSubWallet extends SubWallet {
     private long mInstance;
@@ -15,6 +15,10 @@ public class BTCSubWallet extends SubWallet {
 
     public String GetLegacyAddresses(int index, int count, boolean internal) throws WalletException {
         return GetLegacyAddresses(mInstance, index, count, internal);
+    }
+
+    public String CreateTransaction(String inputs, String outputs, String changeAddress, String feePerKB) throws WalletException {
+        return CreateTransaction(mInstance, inputs, outputs, changeAddress, feePerKB);
     }
 
     public BTCSubWallet(long instance) {
@@ -27,4 +31,5 @@ public class BTCSubWallet extends SubWallet {
     }
 
     private native String GetLegacyAddresses(long subProxy, int index, int count, boolean internal);
+    private native String CreateTransaction(long subProxy, String inputs, String outputs, String changeAddress, String feePerKB);
 }

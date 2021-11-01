@@ -15,6 +15,7 @@ public class MasterWallet {
     static public class CHAINID {
         public static final String MAIN     = "ELA";
         public static final String ID       = "IDChain";
+        public static final String BTC      = "BTC";
     }
 
     static public String TAG = "IMasterWallet";
@@ -71,6 +72,7 @@ public class MasterWallet {
         switch (chainID) {
         case CHAINID.MAIN:
         case CHAINID.ID:
+        case CHAINID.BTC:
             break;
         default:
             if (!chainID.startsWith("ETH")) {
@@ -98,6 +100,9 @@ public class MasterWallet {
                 break;
             case CHAINID.ID:
                 subWallet = new IDChainSubWallet(subProxy);
+                break;
+            case CHAINID.BTC:
+                subWallet = new BTCSubWallet(subProxy);
                 break;
             default:
                 if (chainID.startsWith("ETH")) {
