@@ -184,10 +184,6 @@ public class MasterWallet {
         return ExportMnemonic(mInstance, payPasswd);
     }
 
-    public String ExportReadonlyWallet() throws WalletException {
-        return ExportReadonlyWallet(mInstance);
-    }
-
     public String ExportPrivateKey(String payPasswd) throws WalletException {
         return ExportPrivateKey(mInstance, payPasswd);
     }
@@ -233,8 +229,6 @@ public class MasterWallet {
     private native String ExportKeystore(long instance, String backPasswd, String payPasswd);
 
     private native String ExportMnemonic(long instance, String payPasswd);
-
-    private native String ExportReadonlyWallet(long instance);
 
     private native String ExportPrivateKey(long instance, String payPasswd);
 

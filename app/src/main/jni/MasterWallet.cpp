@@ -482,23 +482,6 @@ static jstring JNICALL ExportMnemonic(JNIEnv *env, jobject clazz, jlong instance
     return jmnemonic;
 }
 
-#define JNI_ExportReadonlyWallet "(J)Ljava/lang/String;"
-
-static jstring JNICALL ExportReadonlyWallet(JNIEnv *env, jobject clazz, jlong instance) {
-    jstring result = NULL;
-
-    IMasterWallet *masterWallet = (IMasterWallet *) instance;
-
-    try {
-        nlohmann::json j = masterWallet->ExportReadonlyWallet();
-        result = env->NewStringUTF(j.dump().c_str());
-    } catch (const std::exception &e) {
-        ThrowWalletException(env, e.what());
-    }
-
-    return result;
-}
-
 #define JNI_ExportPrivateKey "(JLjava/lang/String;)Ljava/lang/String;"
 
 static jstring JNICALL ExportPrivateKey(JNIEnv *env, jobject clazz, jlong instance,
@@ -563,7 +546,6 @@ static const JNINativeMethod methods[] = {
         REGISTER_METHOD(VerifyPayPassword),
         REGISTER_METHOD(ExportKeystore),
         REGISTER_METHOD(ExportMnemonic),
-        REGISTER_METHOD(ExportReadonlyWallet),
         REGISTER_METHOD(ExportPrivateKey),
         REGISTER_METHOD(ExportMasterPublicKey),
 };

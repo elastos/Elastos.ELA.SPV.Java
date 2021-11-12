@@ -64,6 +64,27 @@ public class MasterWalletManager {
         return masterWallet;
     }
 
+    public MasterWallet CreateMasterWallet(
+            String masterWalletId, String singlePrivateKey, String password) throws WalletException {
+
+        if (MasterWalletExist(masterWalletId)) {
+            Log.e(TAG, "Master wallet [" + masterWalletId + "] exist");
+            return null;
+        }
+
+        long instance = CreateMasterWalletWithPrivKey(mInstance, masterWalletId, singlePrivateKey, password);
+
+        if (instance == 0) {
+            Log.e(TAG, "Create master wallet fail");
+            return null;
+        }
+
+        MasterWallet masterWallet = new MasterWallet(instance);
+        mMasterWallets.add(masterWallet);
+
+        return masterWallet;
+    }
+
     public ArrayList<MasterWallet> GetLoadedMasterWallets() throws WalletException {
         return mMasterWallets;
     }
@@ -154,25 +175,6 @@ public class MasterWalletManager {
             Log.e(TAG, "Import master wallet with mnemonic fail");
             return null;
         }
-        MasterWallet masterWallet = new MasterWallet(masterProxy);
-        mMasterWallets.add(masterWallet);
-
-        return masterWallet;
-    }
-
-    public MasterWallet ImportReadonlyWallet(String masterWalletID, String walletJson) throws WalletException {
-        if (MasterWalletExist(masterWalletID)) {
-            Log.e(TAG, "Master wallet [" + masterWalletID + "] exist");
-            return null;
-        }
-
-        long masterProxy = ImportReadonlyWallet(mInstance, masterWalletID, walletJson);
-
-        if (masterProxy == 0) {
-            Log.e(TAG, "Import master wallet [" + masterWalletID + "] error");
-            return null;
-        }
-
         MasterWallet masterWallet = new MasterWallet(masterProxy);
         mMasterWallets.add(masterWallet);
 
@@ -271,6 +273,9 @@ public class MasterWalletManager {
             long instance, String masterWalletId, String mnemonic, String phrasePassword,
             String payPassword, boolean singleAddress);
 
+     private native long CreateMasterWalletWithPrivKey(
+            long instance, String masterWalletId, String singlePrivateKey, String password);
+
     private native long CreateMultiSignMasterWallet(long instance, String masterWalletId,
                                                     String coSigners, int requiredSignCount,
                                                     boolean singleAddress, boolean compatible,
@@ -292,8 +297,6 @@ public class MasterWalletManager {
     private native long ImportWalletWithMnemonic(
             long instance, String masterWalletId, String mnemonic, String phrasePassword,
             String payPassWord, boolean singleAddress, long timestamp);
-
-    private native long ImportReadonlyWallet(long instance, String masterWalletID, String walletJson);
 
     private native String GetVersion(long instance);
 
