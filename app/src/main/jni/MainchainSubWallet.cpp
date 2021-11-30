@@ -1354,6 +1354,311 @@ CreateTerminateProposalTransaction(JNIEnv *env, jobject clazz, jlong jSubWalletP
 
     return result;
 }
+
+
+/*              Reserve Custom ID               */
+#define JNI_ReserveCustomIDOwnerDigest "(JLjava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL
+ReserveCustomIDOwnerDigest(JNIEnv *env, jobject clazz, jlong jSubWalletProxy,
+                                       jstring jpayload) {
+    bool exception = false;
+    std::string msgException;
+    jstring result = NULL;
+
+    const char *payload = env->GetStringUTFChars(jpayload, NULL);
+
+    IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+
+    try {
+        std::string digest = subWallet->ReserveCustomIDOwnerDigest(nlohmann::json::parse(payload));
+        result = env->NewStringUTF(digest.c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jpayload, payload);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return result;
+}
+
+#define JNI_ReserveCustomIDCRCouncilMemberDigest "(JLjava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL
+ReserveCustomIDCRCouncilMemberDigest(JNIEnv *env, jobject clazz, jlong jSubWalletProxy,
+                                       jstring jpayload) {
+    bool exception = false;
+    std::string msgException;
+    jstring result = NULL;
+
+    const char *payload = env->GetStringUTFChars(jpayload, NULL);
+
+    IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+
+    try {
+        std::string digest = subWallet->ReserveCustomIDCRCouncilMemberDigest(nlohmann::json::parse(payload));
+        result = env->NewStringUTF(digest.c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jpayload, payload);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return result;
+}
+
+#define JNI_CreateReserveCustomIDTransaction "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL
+CreateReserveCustomIDTransaction(JNIEnv *env, jobject clazz, jlong jSubWalletProxy,
+                                   jstring jInputs,
+                                   jstring jpayload,
+                                   jstring jFee,
+                                   jstring jmemo) {
+    bool exception = false;
+    std::string msgException;
+    jstring result = NULL;
+
+    const char *inputs = env->GetStringUTFChars(jInputs, NULL);
+    const char *payload = env->GetStringUTFChars(jpayload, NULL);
+    const char *fee = env->GetStringUTFChars(jFee, NULL);
+    const char *memo = env->GetStringUTFChars(jmemo, NULL);
+
+    IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+
+    try {
+        nlohmann::json j = subWallet->CreateReserveCustomIDTransaction(nlohmann::json::parse(inputs),
+                                                                         nlohmann::json::parse(payload), fee, memo);
+        result = env->NewStringUTF(j.dump().c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jInputs, inputs);
+    env->ReleaseStringUTFChars(jpayload, payload);
+    env->ReleaseStringUTFChars(jFee, fee);
+    env->ReleaseStringUTFChars(jmemo, memo);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return result;
+}
+
+#define JNI_ReceiveCustomIDOwnerDigest "(JLjava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL
+ReceiveCustomIDOwnerDigest(JNIEnv *env, jobject clazz, jlong jSubWalletProxy,
+                           jstring jpayload) {
+    bool exception = false;
+    std::string msgException;
+    jstring result = NULL;
+
+    const char *payload = env->GetStringUTFChars(jpayload, NULL);
+
+    IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+
+    try {
+        std::string digest = subWallet->ReceiveCustomIDOwnerDigest(nlohmann::json::parse(payload));
+        result = env->NewStringUTF(digest.c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jpayload, payload);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return result;
+}
+
+#define JNI_ReceiveCustomIDCRCouncilMemberDigest "(JLjava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL
+ReceiveCustomIDCRCouncilMemberDigest(JNIEnv *env, jobject clazz, jlong jSubWalletProxy,
+                           jstring jpayload) {
+    bool exception = false;
+    std::string msgException;
+    jstring result = NULL;
+
+    const char *payload = env->GetStringUTFChars(jpayload, NULL);
+
+    IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+
+    try {
+        std::string digest = subWallet->ReceiveCustomIDCRCouncilMemberDigest(nlohmann::json::parse(payload));
+        result = env->NewStringUTF(digest.c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jpayload, payload);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return result;
+}
+
+#define JNI_CreateReceiveCustomIDTransaction "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL
+CreateReceiveCustomIDTransaction(JNIEnv *env, jobject clazz, jlong jSubWalletProxy,
+                                   jstring jInputs,
+                                   jstring jpayload,
+                                   jstring jFee,
+                                   jstring jmemo) {
+    bool exception = false;
+    std::string msgException;
+    jstring result = NULL;
+
+    const char *inputs = env->GetStringUTFChars(jInputs, NULL);
+    const char *payload = env->GetStringUTFChars(jpayload, NULL);
+    const char *fee = env->GetStringUTFChars(jFee, NULL);
+    const char *memo = env->GetStringUTFChars(jmemo, NULL);
+
+    IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+
+    try {
+        nlohmann::json j = subWallet->CreateReceiveCustomIDTransaction(nlohmann::json::parse(inputs),
+                                                                         nlohmann::json::parse(payload), fee, memo);
+        result = env->NewStringUTF(j.dump().c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jInputs, inputs);
+    env->ReleaseStringUTFChars(jpayload, payload);
+    env->ReleaseStringUTFChars(jFee, fee);
+    env->ReleaseStringUTFChars(jmemo, memo);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return result;
+}
+
+#define JNI_ChangeCustomIDFeeOwnerDigest "(JLjava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL
+ChangeCustomIDFeeOwnerDigest(JNIEnv *env, jobject clazz, jlong jSubWalletProxy,
+                                     jstring jpayload) {
+    bool exception = false;
+    std::string msgException;
+    jstring result = NULL;
+
+    const char *payload = env->GetStringUTFChars(jpayload, NULL);
+
+    IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+
+    try {
+        std::string digest = subWallet->ChangeCustomIDFeeOwnerDigest(nlohmann::json::parse(payload));
+        result = env->NewStringUTF(digest.c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jpayload, payload);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return result;
+}
+
+#define JNI_ChangeCustomIDFeeCRCouncilMemberDigest "(JLjava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL
+ChangeCustomIDFeeCRCouncilMemberDigest(JNIEnv *env, jobject clazz, jlong jSubWalletProxy,
+                             jstring jpayload) {
+    bool exception = false;
+    std::string msgException;
+    jstring result = NULL;
+
+    const char *payload = env->GetStringUTFChars(jpayload, NULL);
+
+    IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+
+    try {
+        std::string digest = subWallet->ChangeCustomIDFeeCRCouncilMemberDigest(nlohmann::json::parse(payload));
+        result = env->NewStringUTF(digest.c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jpayload, payload);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return result;
+}
+
+#define JNI_CreateChangeCustomIDFeeTransaction "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL
+CreateChangeCustomIDFeeTransaction(JNIEnv *env, jobject clazz, jlong jSubWalletProxy,
+                                 jstring jInputs,
+                                 jstring jpayload,
+                                 jstring jFee,
+                                 jstring jmemo) {
+    bool exception = false;
+    std::string msgException;
+    jstring result = NULL;
+
+    const char *inputs = env->GetStringUTFChars(jInputs, NULL);
+    const char *payload = env->GetStringUTFChars(jpayload, NULL);
+    const char *fee = env->GetStringUTFChars(jFee, NULL);
+    const char *memo = env->GetStringUTFChars(jmemo, NULL);
+
+    IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+
+    try {
+        nlohmann::json j = subWallet->CreateChangeCustomIDFeeTransaction(nlohmann::json::parse(inputs),
+                                                                       nlohmann::json::parse(payload), fee, memo);
+        result = env->NewStringUTF(j.dump().c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jInputs, inputs);
+    env->ReleaseStringUTFChars(jpayload, payload);
+    env->ReleaseStringUTFChars(jFee, fee);
+    env->ReleaseStringUTFChars(jmemo, memo);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return result;
+}
+
+/*               Proposal Withdraw              */
+
 #define JNI_ProposalWithdrawDigest "(JLjava/lang/String;)Ljava/lang/String;"
 
 static jstring JNICALL
@@ -1466,6 +1771,15 @@ static const JNINativeMethod methods[] = {
         REGISTER_METHOD(CreateTerminateProposalTransaction),
         REGISTER_METHOD(ProposalWithdrawDigest),
         REGISTER_METHOD(CreateProposalWithdrawTransaction),
+        REGISTER_METHOD(ReserveCustomIDOwnerDigest),
+        REGISTER_METHOD(ReserveCustomIDCRCouncilMemberDigest),
+        REGISTER_METHOD(CreateReserveCustomIDTransaction),
+        REGISTER_METHOD(ReceiveCustomIDOwnerDigest),
+        REGISTER_METHOD(ReceiveCustomIDCRCouncilMemberDigest),
+        REGISTER_METHOD(CreateReceiveCustomIDTransaction),
+        REGISTER_METHOD(ChangeCustomIDFeeOwnerDigest),
+        REGISTER_METHOD(ChangeCustomIDFeeCRCouncilMemberDigest),
+        REGISTER_METHOD(CreateChangeCustomIDFeeTransaction),
 };
 
 jint RegisterMainchainSubWallet(JNIEnv *env, const std::string &path) {

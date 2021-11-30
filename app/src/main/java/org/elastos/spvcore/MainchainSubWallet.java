@@ -175,6 +175,35 @@ public class MainchainSubWallet extends ElastosBaseSubWallet {
         return CreateProposalWithdrawTransaction(mMainchainProxy, inputs, payload, fee, memo);
     }
 
+    public String ReserveCustomIDOwnerDigest(String payload) {
+        return ReserveCustomIDOwnerDigest(mMainchainProxy, payload);
+    }
+    public String ReserveCustomIDCRCouncilMemberDigest(String payload) {
+        return ReserveCustomIDCRCouncilMemberDigest(mMainchainProxy, payload);
+    }
+    public String CreateReserveCustomIDTransaction(String inputs, String payload, String fee, String memo) {
+        return CreateReserveCustomIDTransaction(mMainchainProxy, inputs, payload, fee, memo);
+    }
+    public String ReceiveCustomIDOwnerDigest(String payload) {
+        return ReceiveCustomIDOwnerDigest(mMainchainProxy, payload);
+    }
+    public String ReceiveCustomIDCRCouncilMemberDigest(String payload) {
+        return ReceiveCustomIDCRCouncilMemberDigest(mMainchainProxy, payload);
+    }
+    public String CreateReceiveCustomIDTransaction(String inputs, String payload, String fee, String memo) {
+        return CreateReceiveCustomIDTransaction(mMainchainProxy, inputs, payload, fee, memo);
+    }
+    public String ChangeCustomIDFeeOwnerDigest(String payload) {
+        return ChangeCustomIDFeeOwnerDigest(mMainchainProxy, payload);
+    }
+    public String ChangeCustomIDFeeCRCouncilMemberDigest(String payload) {
+        return ChangeCustomIDFeeCRCouncilMemberDigest(mMainchainProxy, payload);
+    }
+    public String CreateChangeCustomIDFeeTransaction(String inputs, String payload, String fee, String memo) {
+        return CreateChangeCustomIDFeeTransaction(mMainchainProxy, inputs, payload, fee, memo);
+    }
+
+
     private native String CreateDepositTransaction(long proxy, int version, String inputs, String sideChainID, String amount,
                                                    String sideChainAddress, String lockAddress, String fee, String memo);
     private native String GetDepositAddress(long Proxy, String pubkey);
@@ -220,5 +249,15 @@ public class MainchainSubWallet extends ElastosBaseSubWallet {
     private native String CreateTerminateProposalTransaction(long Proxy, String inputs, String payload, String fee, String memo);
     private native String ProposalWithdrawDigest(long Proxy, String payload);
     private native String CreateProposalWithdrawTransaction(long Proxy, String inputs, String payload, String fee, String memo);
+
+    private native String ReserveCustomIDOwnerDigest(long Proxy, String payload);
+    private native String ReserveCustomIDCRCouncilMemberDigest(long Proxy, String payload);
+    private native String CreateReserveCustomIDTransaction(long Proxy, String inputs, String payload, String fee, String memo);
+    private native String ReceiveCustomIDOwnerDigest(long Proxy, String payload);
+    private native String ReceiveCustomIDCRCouncilMemberDigest(long Proxy, String payload);
+    private native String CreateReceiveCustomIDTransaction(long Proxy, String inputs, String payload, String fee, String memo);
+    private native String ChangeCustomIDFeeOwnerDigest(long Proxy, String payload);
+    private native String ChangeCustomIDFeeCRCouncilMemberDigest(long Proxy, String payload);
+    private native String CreateChangeCustomIDFeeTransaction(long Proxy, String inputs, String payload, String fee, String memo);
 
 }
