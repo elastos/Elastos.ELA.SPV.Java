@@ -1729,6 +1729,104 @@ CreateProposalWithdrawTransaction(JNIEnv *env, jobject clazz, jlong jSubWalletPr
     return result;
 }
 
+#define JNI_RegisterSidechainOwnerDigest "(JLjava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL
+RegisterSidechainOwnerDigest(JNIEnv *env, jobject clazz, jlong jSubWalletProxy, jstring jpayload) {
+    bool exception = false;
+    std::string msgException;
+    jstring result = NULL;
+
+    const char *payload = env->GetStringUTFChars(jpayload, NULL);
+
+    IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+
+    try {
+        nlohmann::json j = subWallet->RegisterSidechainOwnerDigest(nlohmann::json::parse(payload));
+        result = env->NewStringUTF(j.dump().c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jpayload, payload);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return result;
+}
+
+#define JNI_RegisterSidechainCRCouncilMemberDigest "(JLjava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL
+RegisterSidechainCRCouncilMemberDigest(JNIEnv *env, jobject clazz, jlong jSubWalletProxy, jstring jpayload) {
+    bool exception = false;
+    std::string msgException;
+    jstring result = NULL;
+
+    const char *payload = env->GetStringUTFChars(jpayload, NULL);
+
+    IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+
+    try {
+        nlohmann::json j = subWallet->RegisterSidechainCRCouncilMemberDigest(nlohmann::json::parse(payload));
+        result = env->NewStringUTF(j.dump().c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jpayload, payload);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return result;
+}
+
+#define JNI_CreateRegisterSidechainTransaction "(JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+
+static jstring JNICALL
+CreateRegisterSidechainTransaction(JNIEnv *env, jobject clazz, jlong jSubWalletProxy,
+                                  jstring jInputs,
+                                  jstring jpayload,
+                                  jstring jFee,
+                                  jstring jmemo) {
+    bool exception = false;
+    std::string msgException;
+    jstring result = NULL;
+
+    const char *inputs = env->GetStringUTFChars(jInputs, NULL);
+    const char *payload = env->GetStringUTFChars(jpayload, NULL);
+    const char *fee = env->GetStringUTFChars(jFee, NULL);
+    const char *memo = env->GetStringUTFChars(jmemo, NULL);
+
+    IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
+
+    try {
+        nlohmann::json j = subWallet->CreateRegisterSidechainTransaction(nlohmann::json::parse(inputs),
+                                                                        nlohmann::json::parse(payload), fee, memo);
+        result = env->NewStringUTF(j.dump().c_str());
+    } catch (const std::exception &e) {
+        exception = true;
+        msgException = e.what();
+    }
+
+    env->ReleaseStringUTFChars(jInputs, inputs);
+    env->ReleaseStringUTFChars(jpayload, payload);
+    env->ReleaseStringUTFChars(jFee, fee);
+    env->ReleaseStringUTFChars(jmemo, memo);
+
+    if (exception) {
+        ThrowWalletException(env, msgException.c_str());
+    }
+
+    return result;
+}
+
 static const JNINativeMethod methods[] = {
         REGISTER_METHOD(CreateDepositTransaction),
         REGISTER_METHOD(GenerateProducerPayload),
@@ -1780,6 +1878,9 @@ static const JNINativeMethod methods[] = {
         REGISTER_METHOD(ChangeCustomIDFeeOwnerDigest),
         REGISTER_METHOD(ChangeCustomIDFeeCRCouncilMemberDigest),
         REGISTER_METHOD(CreateChangeCustomIDFeeTransaction),
+        REGISTER_METHOD(RegisterSidechainOwnerDigest),
+        REGISTER_METHOD(RegisterSidechainCRCouncilMemberDigest),
+        REGISTER_METHOD(CreateRegisterSidechainTransaction),
 };
 
 jint RegisterMainchainSubWallet(JNIEnv *env, const std::string &path) {

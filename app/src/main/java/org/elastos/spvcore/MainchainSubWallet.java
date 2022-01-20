@@ -203,6 +203,15 @@ public class MainchainSubWallet extends ElastosBaseSubWallet {
         return CreateChangeCustomIDFeeTransaction(mMainchainProxy, inputs, payload, fee, memo);
     }
 
+    public String RegisterSidechainOwnerDigest(String payload) {
+        return RegisterSidechainOwnerDigest(mMainchainProxy, payload);
+    }
+    public String RegisterSidechainCRCouncilMemberDigest(String payload) {
+        return RegisterSidechainCRCouncilMemberDigest(mMainchainProxy, payload);
+    }
+    public String CreateRegisterSidechainTransaction(String inputs, String payload, String fee, String memo) {
+        return CreateRegisterSidechainTransaction(mMainchainProxy, inputs, payload, fee, memo);
+    }
 
     private native String CreateDepositTransaction(long proxy, int version, String inputs, String sideChainID, String amount,
                                                    String sideChainAddress, String lockAddress, String fee, String memo);
@@ -259,5 +268,9 @@ public class MainchainSubWallet extends ElastosBaseSubWallet {
     private native String ChangeCustomIDFeeOwnerDigest(long Proxy, String payload);
     private native String ChangeCustomIDFeeCRCouncilMemberDigest(long Proxy, String payload);
     private native String CreateChangeCustomIDFeeTransaction(long Proxy, String inputs, String payload, String fee, String memo);
+
+    private native String RegisterSidechainOwnerDigest(long Proxy, String payload);
+    private native String RegisterSidechainCRCouncilMemberDigest(long Proxy, String payload);
+    private native String CreateRegisterSidechainTransaction(long Proxy, String inputs, String payload, String fee, String memo);
 
 }
