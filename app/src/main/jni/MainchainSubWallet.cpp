@@ -1742,8 +1742,8 @@ RegisterSidechainOwnerDigest(JNIEnv *env, jobject clazz, jlong jSubWalletProxy, 
     IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
 
     try {
-        nlohmann::json j = subWallet->RegisterSidechainOwnerDigest(nlohmann::json::parse(payload));
-        result = env->NewStringUTF(j.dump().c_str());
+        std::string digest = subWallet->RegisterSidechainOwnerDigest(nlohmann::json::parse(payload));
+        result = env->NewStringUTF(digest.c_str());
     } catch (const std::exception &e) {
         exception = true;
         msgException = e.what();
@@ -1771,8 +1771,8 @@ RegisterSidechainCRCouncilMemberDigest(JNIEnv *env, jobject clazz, jlong jSubWal
     IMainchainSubWallet *subWallet = (IMainchainSubWallet *) jSubWalletProxy;
 
     try {
-        nlohmann::json j = subWallet->RegisterSidechainCRCouncilMemberDigest(nlohmann::json::parse(payload));
-        result = env->NewStringUTF(j.dump().c_str());
+        std::string digest = subWallet->RegisterSidechainCRCouncilMemberDigest(nlohmann::json::parse(payload));
+        result = env->NewStringUTF(digest.c_str());
     } catch (const std::exception &e) {
         exception = true;
         msgException = e.what();
