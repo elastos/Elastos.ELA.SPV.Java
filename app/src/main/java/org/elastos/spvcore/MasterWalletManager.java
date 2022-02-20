@@ -160,7 +160,7 @@ public class MasterWalletManager {
     }
 
     public MasterWallet ImportWalletWithMnemonic(
-            String masterWalletId, String mnemonic, String phrasePassword, String payPassWord,
+            String masterWalletId, String mnemonic, String passphrase, String payPassWord,
             boolean singleAddress, long timestamp) throws WalletException {
 
         if (MasterWalletExist(masterWalletId)) {
@@ -169,10 +169,32 @@ public class MasterWalletManager {
         }
 
         long masterProxy = ImportWalletWithMnemonic(mInstance, masterWalletId,
-                mnemonic, phrasePassword, payPassWord, singleAddress, timestamp);
+                mnemonic, passphrase, payPassWord, singleAddress, timestamp);
 
         if (masterProxy == 0) {
             Log.e(TAG, "Import master wallet with mnemonic fail");
+            return null;
+        }
+        MasterWallet masterWallet = new MasterWallet(masterProxy);
+        mMasterWallets.add(masterWallet);
+
+        return masterWallet;
+    }
+
+    public MasterWallet ImportWalletWithSeed(
+            String masterWalletId, String seed, String payPassWord, boolean singleAddress,
+            String mnemonic, String passphrase) throws WalletException {
+
+        if (MasterWalletExist(masterWalletId)) {
+            Log.e(TAG, "Master wallet [" + masterWalletId + "] exist");
+            return null;
+        }
+
+        long masterProxy = ImportWalletWithSeed(mInstance, masterWalletId,
+                seed, payPassWord, singleAddress, mnemonic, passphrase);
+
+        if (masterProxy == 0) {
+            Log.e(TAG, "Import master wallet with seed fail");
             return null;
         }
         MasterWallet masterWallet = new MasterWallet(masterProxy);
@@ -295,8 +317,12 @@ public class MasterWalletManager {
             String payPassWord);
 
     private native long ImportWalletWithMnemonic(
-            long instance, String masterWalletId, String mnemonic, String phrasePassword,
+            long instance, String masterWalletId, String mnemonic, String passphrase,
             String payPassWord, boolean singleAddress, long timestamp);
+
+    private native long ImportWalletWithSeed(
+            long instance, String masterWalletId, String seed, String payPassword, boolean singleAddress,
+            String mnemonic, String passphrase);
 
     private native String GetVersion(long instance);
 
